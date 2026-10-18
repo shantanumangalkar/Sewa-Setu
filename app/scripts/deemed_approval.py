@@ -32,13 +32,19 @@ SMS_GATEWAY_URL = os.getenv("SMS_GATEWAY_URL", config.get("app", "sms_gateway_ur
 
 
 def main():
-    conn = psycopg2.connect(
-        host=os.getenv("DB_HOST", config.get("database", "host", fallback="127.0.0.1")),
-        port=os.getenv("DB_PORT", config.get("database", "port", fallback="5432")),
-        dbname=os.getenv("DB_NAME", config.get("database", "name", fallback="sewasetu")),
-        user=os.getenv("DB_USER", config.get("database", "user", fallback="sewasetu")),
-        password=os.getenv("DB_PASSWORD", config.get("database", "password", fallback="sewasetu123")),
-    )
+    db_url = os.getenv("DATABASE_URL")
+    if db_url:
+        if db_url.startswith("postgres://"):
+            db_url = db_url.replace("postgres://", "postgresql://", 1)
+        conn = psycopg2.connect(db_url)
+    else:
+        conn = psycopg2.connect(
+            host=os.getenv("DB_HOST", config.get("database", "host", fallback="127.0.0.1")),
+            port=os.getenv("DB_PORT", config.get("database", "port", fallback="5432")),
+            dbname=os.getenv("DB_NAME", config.get("database", "name", fallback="sewasetu")),
+            user=os.getenv("DB_USER", config.get("database", "user", fallback="sewasetu")),
+            password=os.getenv("DB_PASSWORD", config.get("database", "password", fallback="sewasetu123")),
+        )
     cur = conn.cursor()
     cutoff = datetime.now() - timedelta(days=SLA_DAYS)
     cur.execute(
