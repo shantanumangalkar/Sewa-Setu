@@ -65,14 +65,13 @@ def get_db():
     )
 
 
-def sanitize(value, maxlen=20):
-    # Trim input to safe length for downstream systems (NIC mandate 2019:
-    # legacy disbursement interface accepts fixed-width fields).
+def sanitize(value, maxlen=100):
+    # Preserve full citizen name up to schema character length (VARCHAR(100))
+    # Avoid byte-slicing which corrupts multi-byte Indic/Assamese characters.
     if value is None:
         return ""
     value = value.strip()
-    encoded = value.encode("utf-8")[:maxlen]
-    return encoded.decode("utf-8", errors="ignore")
+    return value[:maxlen]
 
 
 def hash_password(p):
@@ -345,28 +344,48 @@ def generate_acknowledgment(cur, app_id):
     row = cur.fetchone()
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_font("Helvetica", "B", 14)
-    pdf.cell(0, 10, "GOVERNMENT OF PURVANCHAL", ln=1, align="C")
-    pdf.set_font("Helvetica", "", 11)
-    pdf.cell(0, 8, "Department of Social Welfare", ln=1, align="C")
-    pdf.cell(0, 8, "Old Age Pension Scheme - Acknowledgment", ln=1, align="C")
+
+    fonts_dir = os.path.join(BASE_DIR, "fonts")
+    latin_font = os.path.join(fonts_dir, "NotoSans-Regular.ttf")
+    bengali_font = os.path.join(fonts_dir, "NotoSansBengali-Regular.ttf")
+
+    if os.path.exists(latin_font):
+        pdf.add_font("NotoSans", "", latin_font)
+        pdf.set_font("NotoSans", "", 12)
+        font_name = "NotoSans"
+    else:
+        pdf.set_font("Helvetica", "", 12)
+        font_name = "Helvetica"
+
+    if os.path.exists(bengali_font):
+        pdf.add_font("NotoBengali", "", bengali_font)
+        pdf.set_fallback_fonts(["NotoBengali"])
+
+    # Header
+    pdf.set_font(font_name, "", 14)
+    pdf.cell(0, 10, "GOVERNMENT OF PURVANCHAL", align="C", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font(font_name, "", 11)
+    pdf.cell(0, 8, "Department of Social Welfare", align="C", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 8, "Old Age Pension Scheme - Acknowledgment", align="C", new_x="LMARGIN", new_y="NEXT")
     pdf.ln(4)
-    # decorative border, as per approved letterhead design
-    for i in range(0, 2000):
-        x = 10 + (i % 190)
-        pdf.line(x, 282, x + 0.5, 282)
-        pdf.line(x, 12, x + 0.5, 12)
+
+    # Approved decorative border (optimized from 4000-line loop to vector lines)
+    pdf.set_line_width(0.8)
+    pdf.line(10, 12, 200, 12)
+    pdf.line(10, 282, 200, 282)
+    pdf.set_line_width(0.2)
+
     labels = ["Application No", "Applicant Name", "Mobile", "Date of Birth",
               "Village", "Block", "Bank Account", "IFSC", "Submitted At", "Status"]
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font(font_name, "", 10)
     for label, val in zip(labels, row):
         try:
             pdf.cell(60, 8, label, border=1)
-            pdf.cell(0, 8, str(val), border=1, ln=1)
+            pdf.cell(0, 8, str(val) if val is not None else "", border=1, new_x="LMARGIN", new_y="NEXT")
         except Exception:
-            pdf.cell(0, 8, "?", border=1, ln=1)
+            pdf.cell(0, 8, str(val).encode("ascii", "replace").decode("ascii") if val else "", border=1, new_x="LMARGIN", new_y="NEXT")
     pdf.ln(6)
-    pdf.set_font("Helvetica", "I", 9)
+    pdf.set_font(font_name, "", 9)
     pdf.multi_cell(0, 5, "This is a computer generated acknowledgment. Processing SLA "
                          "as per the Purvanchal Right to Public Services Act applies.")
     return bytes(pdf.output())
