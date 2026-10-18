@@ -159,6 +159,30 @@ def about():
     return render_template("about.html")
 
 
+@app.route("/health")
+def health():
+    db_ok = False
+    err = None
+    count = 0
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("SELECT count(*) FROM applications;")
+        count = cur.fetchone()[0]
+        cur.close()
+        conn.close()
+        db_ok = True
+    except Exception as e:
+        err = str(e)
+    return jsonify({
+        "status": "ok" if db_ok else "database_error",
+        "database_connected": db_ok,
+        "database_url_configured": bool(os.getenv("DATABASE_URL")),
+        "application_count": count,
+        "error": err
+    })
+
+
 @app.route("/__gateway/", defaults={"subpath": ""})
 @app.route("/__gateway/<path:subpath>")
 def gateway_proxy(subpath):
