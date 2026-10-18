@@ -78,12 +78,18 @@ def hash_password(p):
     return hashlib.sha256(p.encode("utf-8")).hexdigest()
 
 
+import threading
+
 def send_sms(mobile, text):
-    try:
-        requests.post(SMS_GATEWAY_URL + "/api/send",
-                      json={"to": mobile, "text": text}, timeout=5)
-    except Exception as e:
-        app.logger.error("sms gateway error: %s" % e)
+    # Decouple external SMS HTTP latency from user request-response cycle
+    def _async():
+        try:
+            requests.post(SMS_GATEWAY_URL + "/api/send",
+                          json={"to": mobile, "text": text}, timeout=5)
+        except Exception as e:
+            app.logger.error("sms gateway error: %s" % e)
+    t = threading.Thread(target=_async, daemon=True)
+    t.start()
 
 
 def deadline_remaining():

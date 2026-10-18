@@ -17,7 +17,7 @@ def test_database_indexes_prevent_sequential_scans():
     plan_lines = [row[0] for row in cur.fetchall()]
     plan_text = " ".join(plan_lines)
 
-    assert "Index Scan" in plan_text or "Bitmap Index Scan" in plan_text, (
+    assert any(k in plan_text for k in ("Index Scan", "Bitmap Index Scan", "Index Only Scan")), (
         f"Query on mobile performed full table Seq Scan instead of Index Scan!\nPlan:\n{plan_text}"
     )
 
@@ -26,7 +26,7 @@ def test_database_indexes_prevent_sequential_scans():
     plan_lines_sla = [row[0] for row in cur.fetchall()]
     plan_text_sla = " ".join(plan_lines_sla)
 
-    assert "Index Scan" in plan_text_sla or "Bitmap Index Scan" in plan_text_sla, (
+    assert any(k in plan_text_sla for k in ("Index Scan", "Bitmap Index Scan", "Index Only Scan")), (
         f"Query on status/submitted_at performed full table Seq Scan!\nPlan:\n{plan_text_sla}"
     )
 
