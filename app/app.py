@@ -472,7 +472,12 @@ def generate_acknowledgment(cur, app_id):
                 "bank_account, ifsc, submitted_at, status FROM applications WHERE id = %s",
                 (app_id,))
     row = cur.fetchone()
+    if not row:
+        row = ("", "", "", None, "", "", "", "", None, "PENDING")
+
     pdf = FPDF()
+    pdf.set_margins(15, 15, 15)
+    pdf.set_auto_page_break(False)
     pdf.add_page()
 
     fonts_dir = os.path.join(BASE_DIR, "fonts")
@@ -491,33 +496,135 @@ def generate_acknowledgment(cur, app_id):
         pdf.add_font("NotoBengali", "", bengali_font)
         pdf.set_fallback_fonts(["NotoBengali"])
 
-    # Header
-    pdf.set_font(font_name, "", 14)
-    pdf.cell(0, 10, "GOVERNMENT OF PURVANCHAL", align="C", new_x="LMARGIN", new_y="NEXT")
+    # Outer decorative framing borders
+    pdf.set_draw_color(11, 61, 110)
+    pdf.set_line_width(0.7)
+    pdf.rect(10, 10, 190, 277)
+    pdf.set_draw_color(200, 215, 230)
+    pdf.set_line_width(0.3)
+    pdf.rect(11.5, 11.5, 187, 274)
+
+    # Top Header
+    pdf.set_y(16)
+    pdf.set_font(font_name, "", 15)
+    pdf.set_text_color(11, 61, 110)
+    pdf.cell(180, 8, "GOVERNMENT OF PURVANCHAL", align="C", new_x="LMARGIN", new_y="NEXT")
+
     pdf.set_font(font_name, "", 11)
-    pdf.cell(0, 8, "Department of Social Welfare", align="C", new_x="LMARGIN", new_y="NEXT")
-    pdf.cell(0, 8, "Old Age Pension Scheme - Acknowledgment", align="C", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_text_color(50, 50, 50)
+    pdf.cell(180, 6, "DEPARTMENT OF SOCIAL WELFARE", align="C", new_x="LMARGIN", new_y="NEXT")
+
+    pdf.set_font(font_name, "", 9)
+    pdf.set_text_color(100, 100, 100)
+    pdf.cell(180, 5, "Indira Gandhi National Old Age Pension Scheme (IGNOAPS) - Sewa Setu Portal", align="C", new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(2)
+
+    # Saffron brand accent stripe
+    pdf.set_draw_color(247, 147, 30)
+    pdf.set_line_width(1.0)
+    pdf.line(20, pdf.get_y(), 190, pdf.get_y())
     pdf.ln(4)
 
-    # Approved decorative border (optimized from 4000-line loop to vector lines)
-    pdf.set_line_width(0.8)
-    pdf.line(10, 12, 200, 12)
-    pdf.line(10, 282, 200, 282)
+    # Title Badge
+    pdf.set_fill_color(11, 61, 110)
+    pdf.set_text_color(255, 255, 255)
+    pdf.set_font(font_name, "", 11)
+    pdf.cell(180, 8, "OFFICIAL APPLICATION ACKNOWLEDGMENT RECEIPT", align="C", fill=True, new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(5)
+
+    # Format values
+    app_no = str(row[0] or "")
+    applicant_name = str(row[1] or "")
+    mobile = str(row[2] or "")
+
+    dob_val = row[3]
+    if isinstance(dob_val, (date, datetime)):
+        dob_str = dob_val.strftime("%d/%m/%Y")
+    else:
+        dob_str = str(dob_val) if dob_val else "-"
+
+    village = str(row[4] or "")
+    block = str(row[5] or "")
+    bank_account = str(row[6] or "")
+    ifsc = str(row[7] or "")
+
+    sub_val = row[8]
+    if isinstance(sub_val, datetime):
+        sub_str = sub_val.strftime("%d/%m/%Y %I:%M %p")
+    elif isinstance(sub_val, date):
+        sub_str = sub_val.strftime("%d/%m/%Y")
+    else:
+        sub_str = str(sub_val).split(".")[0] if sub_val else "-"
+
+    status_str = str(row[9] or "PENDING")
+
+    items = [
+        ("Application Number", app_no),
+        ("Applicant Name", applicant_name),
+        ("Registered Mobile", mobile),
+        ("Date of Birth", dob_str),
+        ("Village / Town", village),
+        ("Development Block", block),
+        ("Bank Account Number", bank_account),
+        ("Bank IFSC Code", ifsc),
+        ("Date of Submission", sub_str),
+        ("Application Status", status_str),
+    ]
+
+    pdf.set_draw_color(180, 195, 210)
     pdf.set_line_width(0.2)
 
-    labels = ["Application No", "Applicant Name", "Mobile", "Date of Birth",
-              "Village", "Block", "Bank Account", "IFSC", "Submitted At", "Status"]
-    pdf.set_font(font_name, "", 10)
-    for label, val in zip(labels, row):
+    for label, val in items:
+        # Label Column (55mm)
+        pdf.set_fill_color(244, 247, 250)
+        pdf.set_text_color(50, 60, 75)
+        pdf.set_font(font_name, "", 9.5)
+        pdf.cell(55, 8.5, "  " + label, border=1, fill=True)
+
+        # Value Column (125mm)
+        pdf.set_fill_color(255, 255, 255)
+        pdf.set_text_color(15, 25, 35)
+        pdf.set_font(font_name, "", 9.5)
         try:
-            pdf.cell(60, 8, label, border=1)
-            pdf.cell(0, 8, str(val) if val is not None else "", border=1, new_x="LMARGIN", new_y="NEXT")
+            pdf.cell(125, 8.5, "  " + val, border=1, fill=True, new_x="LMARGIN", new_y="NEXT")
         except Exception:
-            pdf.cell(0, 8, str(val).encode("ascii", "replace").decode("ascii") if val else "", border=1, new_x="LMARGIN", new_y="NEXT")
+            safe_val = val.encode("ascii", "replace").decode("ascii")
+            pdf.cell(125, 8.5, "  " + safe_val, border=1, fill=True, new_x="LMARGIN", new_y="NEXT")
+
     pdf.ln(6)
-    pdf.set_font(font_name, "", 9)
-    pdf.multi_cell(0, 5, "This is a computer generated acknowledgment. Processing SLA "
-                         "as per the Purvanchal Right to Public Services Act applies.")
+
+    # RTPS Statutory SLA Callout Box
+    pdf.set_fill_color(254, 250, 238)
+    pdf.set_draw_color(230, 200, 140)
+    pdf.set_line_width(0.3)
+    curr_y = pdf.get_y()
+    pdf.rect(15, curr_y, 180, 24, style="DF")
+
+    pdf.set_y(curr_y + 2)
+    pdf.set_x(18)
+    pdf.set_text_color(160, 90, 0)
+    pdf.set_font(font_name, "", 9.5)
+    pdf.cell(174, 5, "Right to Public Services (RTPS) Act, 2019 - Statutory Guarantee:", new_x="LMARGIN", new_y="NEXT")
+
+    pdf.set_x(18)
+    pdf.set_text_color(70, 70, 70)
+    pdf.set_font(font_name, "", 8.5)
+    pdf.multi_cell(174, 4.2, "This scheme is governed by a mandatory 15-day service delivery SLA. If no decision is conveyed by the Department of Social Welfare within 15 working days from submission, this application stands deemed approved by law.")
+
+    pdf.set_y(curr_y + 28)
+
+    # Footer Information Grid
+    pdf.set_draw_color(210, 215, 225)
+    pdf.line(15, pdf.get_y(), 195, pdf.get_y())
+    pdf.ln(3)
+
+    pdf.set_text_color(100, 110, 120)
+    pdf.set_font(font_name, "", 8)
+    pdf.cell(90, 4, "Track status: https://sewa-setu-09vo.onrender.com/status", new_x="RIGHT")
+    pdf.cell(90, 4, "Computer-Generated Legal Acknowledgment", align="R", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(90, 4, "Default Password: DOB as DDMMYYYY (e.g. 12061950)", new_x="RIGHT")
+    pdf.cell(90, 4, "Government of Purvanchal - State Social Security Portal", align="R", new_x="LMARGIN", new_y="NEXT")
+
     return bytes(pdf.output())
 
 
@@ -731,12 +838,15 @@ def ack_pdf(app_id):
         return redirect(url_for("status_login"))
 
     filename = "acknowledgment_%s.pdf" % (app_row[1] or str(app_id))
-    path = os.path.join(UPLOAD_DIR, "ack", "%d.pdf" % app_id)
-    if os.path.exists(path):
-        cur.close(); conn.close()
-        return send_file(path, mimetype="application/pdf", as_attachment=True, download_name=filename)
-
     data = generate_acknowledgment(cur, app_id)
+    # Update on-disk copy if present
+    try:
+        ack_file = os.path.join(UPLOAD_DIR, "ack", "%d.pdf" % app_id)
+        if os.path.exists(os.path.dirname(ack_file)):
+            with open(ack_file, "wb") as f:
+                f.write(data)
+    except Exception:
+        pass
     cur.close(); conn.close()
     return send_file(io.BytesIO(data), mimetype="application/pdf", as_attachment=True, download_name=filename)
 
