@@ -38,6 +38,8 @@ CREATE TABLE IF NOT EXISTS otps (
 
 -- Performance indexes to eliminate sequential scans on 100k+ rows
 CREATE INDEX IF NOT EXISTS idx_applications_mobile ON applications(mobile);
+CREATE INDEX IF NOT EXISTS idx_applications_app_no ON applications(application_no);
 CREATE INDEX IF NOT EXISTS idx_applications_status_submitted ON applications(status, submitted_at);
 CREATE INDEX IF NOT EXISTS idx_applications_block_status ON applications(block, status);
+
 

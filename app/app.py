@@ -690,17 +690,56 @@ def admin_dashboard():
 def admin_list():
     if not session.get("admin"):
         return redirect(url_for("admin_login"))
-    status = request.args.get("status", "PENDING")
-    page = int(request.args.get("page", 1))
+    status = request.args.get("status", "")
+    q = request.args.get("q", "").strip()
+    try:
+        page = max(1, int(request.args.get("page", 1)))
+    except (ValueError, TypeError):
+        page = 1
+
+    # Default to PENDING if neither search query nor status is specified
+    if not q and not status:
+        status = "PENDING"
+
+    where_clauses = []
+    params = []
+
+    if status:
+        where_clauses.append("status = %s")
+        params.append(status)
+
+    if q:
+        where_clauses.append(
+            "(applicant_name ILIKE %s OR application_no ILIKE %s OR mobile ILIKE %s OR bank_account ILIKE %s)"
+        )
+        like_q = f"%{q}%"
+        params.extend([like_q, like_q, like_q, like_q])
+
+    where_sql = ("WHERE " + " AND ".join(where_clauses)) if where_clauses else ""
+
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("SELECT id, application_no, applicant_name, mobile, block, status, "
-                "submitted_at FROM applications WHERE status = %s "
-                "ORDER BY submitted_at ASC LIMIT 50 OFFSET %s",
-                (status, (page - 1) * 50))
+    cur.execute(f"SELECT count(*) FROM applications {where_sql}", tuple(params))
+    total_count = cur.fetchone()[0]
+
+    limit = 50
+    offset = (page - 1) * limit
+    cur.execute(
+        f"SELECT id, application_no, applicant_name, mobile, block, status, "
+        f"submitted_at FROM applications {where_sql} "
+        f"ORDER BY submitted_at DESC LIMIT %s OFFSET %s",
+        tuple(params + [limit, offset])
+    )
     rows = cur.fetchall()
     cur.close(); conn.close()
-    return render_template("admin_list.html", rows=rows, status=status, page=page)
+    return render_template(
+        "admin_list.html",
+        rows=rows,
+        status=status,
+        page=page,
+        q=q,
+        total_count=total_count
+    )
 
 
 @app.route("/admin/application/<int:app_id>")

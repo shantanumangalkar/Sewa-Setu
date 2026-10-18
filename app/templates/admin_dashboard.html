@@ -1,10 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Dashboard</h2>
-<p><a href="/admin/applications?status=PENDING">Pending</a> |
-<a href="/admin/applications?status=APPROVED">Approved</a> |
-<a href="/admin/applications?status=REJECTED">Rejected</a> |
-<a href="/admin/applications?status=DEEMED_APPROVED">Deemed Approved</a></p>
+<h2>Admin Dashboard</h2>
+
+<!-- Candidate Search Bar -->
+<div style="background:#f4f6f9;padding:16px 20px;border-radius:6px;border:1px solid #dcdfe4;margin-bottom:20px;">
+  <h3 style="margin:0 0 10px;font-size:16px;color:#0b3d6e;">Find Candidate / Application</h3>
+  <form method="get" action="/admin/applications" style="display:flex;gap:10px;flex-wrap:wrap;">
+    <input type="text" name="q" placeholder="Search by Candidate Name, Application No, Mobile Number, or Bank Account..." style="flex:1;min-width:280px;padding:9px 12px;font-size:14px;border:1px solid #aab;border-radius:4px;">
+    <button class="btn" type="submit">Search Candidate</button>
+  </form>
+</div>
+
+<p>
+  <strong>Filter by Status:</strong> &nbsp;
+  <a href="/admin/applications?status=PENDING">Pending</a> |
+  <a href="/admin/applications?status=APPROVED">Approved</a> |
+  <a href="/admin/applications?status=REJECTED">Rejected</a> |
+  <a href="/admin/applications?status=DEEMED_APPROVED">Deemed Approved</a> |
+  <a href="/admin/applications">All Applications</a>
+</p>
 
 <h3>Applications by Status</h3>
 <table class="tbl" style="max-width:400px">

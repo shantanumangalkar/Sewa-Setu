@@ -1,20 +1,95 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Applications &mdash; {{ status }}</h2>
-<p><a href="/admin/dashboard">&laquo; Dashboard</a></p>
+<p><a href="/admin/dashboard">&laquo; Back to Dashboard</a></p>
+
+<h2>
+  {% if q %}
+  Search Results for &ldquo;{{ q }}&rdquo;
+  <span style="font-size:15px;font-weight:normal;color:#666;">({{ total_count }} match{% if total_count != 1 %}es{% endif %} found)</span>
+  {% else %}
+  Applications &mdash; {{ status or 'All' }}
+  <span style="font-size:15px;font-weight:normal;color:#666;">({{ total_count }} total)</span>
+  {% endif %}
+</h2>
+
+<!-- Search and Filter Bar -->
+<div style="background:#f4f6f9;padding:14px 18px;border-radius:6px;border:1px solid #dcdfe4;margin-bottom:18px;">
+  <form method="get" action="/admin/applications" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search candidate by name, application no, mobile, bank account..." style="flex:1;min-width:260px;padding:8px 12px;font-size:14px;border:1px solid #aab;border-radius:4px;">
+    {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
+    <button class="btn" type="submit">Search</button>
+    {% if q %}
+    <a href="/admin/applications{% if status %}?status={{ status }}{% endif %}" class="btn" style="background:#6c757d;text-decoration:none;display:inline-flex;align-items:center;padding:8px 14px;">Clear Search</a>
+    {% endif %}
+  </form>
+</div>
+
+<!-- Status Filters -->
+<p style="margin:12px 0 16px;">
+  <strong>Filter:</strong> &nbsp;
+  <a href="/admin/applications?q={{ q }}" {% if not status %}style="font-weight:bold;text-decoration:underline;"{% endif %}>All</a> |
+  <a href="/admin/applications?status=PENDING&q={{ q }}" {% if status=='PENDING' %}style="font-weight:bold;text-decoration:underline;"{% endif %}>Pending</a> |
+  <a href="/admin/applications?status=APPROVED&q={{ q }}" {% if status=='APPROVED' %}style="font-weight:bold;text-decoration:underline;"{% endif %}>Approved</a> |
+  <a href="/admin/applications?status=REJECTED&q={{ q }}" {% if status=='REJECTED' %}style="font-weight:bold;text-decoration:underline;"{% endif %}>Rejected</a> |
+  <a href="/admin/applications?status=DEEMED_APPROVED&q={{ q }}" {% if status=='DEEMED_APPROVED' %}style="font-weight:bold;text-decoration:underline;"{% endif %}>Deemed Approved</a>
+</p>
+
 <table class="tbl">
-<tr><th>ID</th><th>Application No</th><th>Name</th><th>Mobile</th><th>Block</th>
-<th>Status</th><th>Submitted</th><th></th></tr>
-{% for r in rows %}
-<tr>
-  <td>{{ r[0] }}</td><td>{{ r[1] }}</td><td>{{ r[2] }}</td><td>{{ r[3] }}</td>
-  <td>{{ r[4] }}</td><td>{{ r[5] }}</td><td>{{ r[6] }}</td>
-  <td><a href="/admin/application/{{ r[0] }}">View</a></td>
-</tr>
-{% endfor %}
+<thead>
+  <tr>
+    <th>ID</th>
+    <th>Application No</th>
+    <th>Candidate Name</th>
+    <th>Mobile</th>
+    <th>Block</th>
+    <th>Status</th>
+    <th>Submitted</th>
+    <th>Action</th>
+  </tr>
+</thead>
+<tbody>
+{% if rows %}
+  {% for r in rows %}
+  <tr>
+    <td>{{ r[0] }}</td>
+    <td><strong>{{ r[1] }}</strong></td>
+    <td>{{ r[2] }}</td>
+    <td>{{ r[3] }}</td>
+    <td>{{ r[4] }}</td>
+    <td>
+      <span style="display:inline-block;padding:2px 8px;border-radius:3px;font-size:12px;font-weight:bold;
+        {% if r[5]=='APPROVED' or r[5]=='DEEMED_APPROVED' %}background:#d4edda;color:#155724;
+        {% elif r[5]=='REJECTED' %}background:#f8d7da;color:#721c24;
+        {% else %}background:#fff3cd;color:#856404;{% endif %}">
+        {{ r[5] }}
+      </span>
+    </td>
+    <td>{{ r[6].strftime('%d/%m/%Y %H:%M') if r[6] else '-' }}</td>
+    <td><a href="/admin/application/{{ r[0] }}"><button class="btn" style="padding:4px 10px;font-size:13px;">View</button></a></td>
+  </tr>
+  {% endfor %}
+{% else %}
+  <tr>
+    <td colspan="8" style="text-align:center;padding:24px;color:#666;">
+      No candidate applications found matching your criteria.
+    </td>
+  </tr>
+{% endif %}
+</tbody>
 </table>
-<p>
-{% if page > 1 %}<a href="?status={{ status }}&page={{ page - 1 }}">&laquo; Previous</a>{% endif %}
-&nbsp;<a href="?status={{ status }}&page={{ page + 1 }}">Next &raquo;</a>
+
+<p style="margin-top:20px;">
+  {% if page > 1 %}
+  <a href="?status={{ status }}&q={{ q }}&page={{ page - 1 }}">&laquo; Previous Page</a>
+  {% endif %}
+  &nbsp;
+  {% if rows|length == 50 and (page * 50) < total_count %}
+  <a href="?status={{ status }}&q={{ q }}&page={{ page + 1 }}">Next Page &raquo;</a>
+  {% endif %}
+  {% if total_count > 0 %}
+  <span style="color:#777;font-size:13px;margin-left:14px;">
+    Page {{ page }} of {{ ((total_count - 1) // 50) + 1 }}
+  </span>
+  {% endif %}
 </p>
 {% endblock %}
