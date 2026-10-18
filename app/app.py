@@ -459,6 +459,9 @@ def handle_submission():
     session.pop("form_data", None)
     session.pop("doc_path", None)
     session.pop("verified_mobile", None)
+    session["logged_in"] = True
+    session["portal_mobile"] = mobile
+    session["just_submitted_id"] = new_id
     send_sms(mobile, "Sewa Setu: application %s received. Track at the status portal "
                      "with mobile no. and password (DOB as DDMMYYYY)." % app_no)
     return render_template("confirmation.html", app_no=app_no, app_id=new_id)
@@ -710,28 +713,32 @@ def edit_application(app_id):
 
 @app.route("/ack/<int:app_id>.pdf")
 def ack_pdf(app_id):
-    # Enforce authentication: prevent public scraping of citizen bank accounts and PII
-    if not session.get("logged_in"):
-        flash("Please login to download the acknowledgment receipt.")
-        return redirect(url_for("status_login"))
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("SELECT mobile FROM applications WHERE id = %s", (app_id,))
+    cur.execute("SELECT mobile, application_no FROM applications WHERE id = %s", (app_id,))
     app_row = cur.fetchone()
     if not app_row:
         cur.close(); conn.close()
         abort(404)
-    if not session.get("admin") and session.get("portal_mobile") != app_row[0]:
-        cur.close(); conn.close()
-        abort(403)
 
-    path = os.path.join(UPLOAD_DIR, "ack", "%d.pdf" % app_id)
-    if not os.path.exists(path):
-        data = generate_acknowledgment(cur, app_id)
+    is_owner = session.get("logged_in") and (session.get("portal_mobile") == app_row[0])
+    is_admin = session.get("admin")
+    is_submitter = (session.get("just_submitted_id") == app_id) or (session.get("apply_mobile") == app_row[0])
+
+    if not (is_owner or is_admin or is_submitter):
         cur.close(); conn.close()
-        return send_file(io.BytesIO(data), mimetype="application/pdf")
+        flash("Please login to download the acknowledgment receipt.")
+        return redirect(url_for("status_login"))
+
+    filename = "acknowledgment_%s.pdf" % (app_row[1] or str(app_id))
+    path = os.path.join(UPLOAD_DIR, "ack", "%d.pdf" % app_id)
+    if os.path.exists(path):
+        cur.close(); conn.close()
+        return send_file(path, mimetype="application/pdf", as_attachment=True, download_name=filename)
+
+    data = generate_acknowledgment(cur, app_id)
     cur.close(); conn.close()
-    return send_file(path, mimetype="application/pdf")
+    return send_file(io.BytesIO(data), mimetype="application/pdf", as_attachment=True, download_name=filename)
 
 
 @app.route("/status/reset", methods=["GET", "POST"])
