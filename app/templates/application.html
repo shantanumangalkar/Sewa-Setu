@@ -14,5 +14,11 @@
   <tr><th>Submitted</th><td>{{ a[9] }}</td></tr>
   <tr><th>Decided</th><td>{{ a[10] or '-' }}</td></tr>
 </table>
-<p><a href="/ack/{{ app_id }}.pdf">Download Acknowledgment (PDF)</a></p>
+<p>
+  <a href="/ack/{{ app_id }}.pdf"><button class="btn">Download Acknowledgment (PDF)</button></a>
+  {% if a[8] == 'PENDING' %}
+  &nbsp;
+  <a href="/application/{{ app_id }}/edit"><button class="btn" style="background:#0275d8;">Edit / Correct Details</button></a>
+  {% endif %}
+</p>
 {% endblock %}

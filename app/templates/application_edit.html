@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Correct Application Details &mdash; {{ a[0] }}</h2>
+<p class="note" style="background:#e8f4fd;padding:10px;border-left:4px solid #0b3d6e;margin-bottom:16px;">
+  <strong>Notice:</strong> You can correct typos or inaccurate details while your application is under review.
+  Corrections update your existing application directly without creating duplicate records.
+</p>
+
+<form method="post">
+  <label>Full Name of Applicant</label>
+  <input type="text" name="applicant_name" value="{{ a[1] }}" required>
+
+  <label>Date of Birth (DD/MM/YYYY)</label>
+  <input type="text" name="dob" value="{{ a[3].strftime('%d/%m/%Y') if a[3] else '' }}" placeholder="DD/MM/YYYY" required>
+
+  <label>Gender</label>
+  <select name="gender">
+    <option value="Male" {% if a[4]=='Male' %}selected{% endif %}>Male</option>
+    <option value="Female" {% if a[4]=='Female' %}selected{% endif %}>Female</option>
+    <option value="Other" {% if a[4]=='Other' %}selected{% endif %}>Other</option>
+  </select>
+
+  <label>Marital Status</label>
+  <select name="marital_status">
+    <option value="Married" {% if a[5]=='Married' %}selected{% endif %}>Married</option>
+    <option value="Unmarried" {% if a[5]=='Unmarried' %}selected{% endif %}>Unmarried</option>
+    <option value="Widowed" {% if a[5]=='Widowed' %}selected{% endif %}>Widowed</option>
+  </select>
+
+  <label>Husband's Name (if applicable)</label>
+  <input type="text" name="husband_name" value="{{ a[6] or '' }}">
+
+  <label>Village / Town</label>
+  <input type="text" name="village" value="{{ a[7] }}" required>
+
+  <label>Block</label>
+  <select name="block" required>
+    {% for b in blocks %}
+    <option {% if a[8]==b %}selected{% endif %}>{{ b }}</option>
+    {% endfor %}
+  </select>
+
+  <label>Bank Account Number</label>
+  <input type="text" name="bank_account" value="{{ a[9] }}" required>
+
+  <label>IFSC Code</label>
+  <input type="text" name="ifsc" value="{{ a[10] }}" required>
+
+  <p style="margin-top:20px;">
+    <button class="btn" type="submit">Save Changes</button>
+    &nbsp;
+    <a href="/application/{{ app_id }}" class="note" style="margin-left:10px;">Cancel</a>
+  </p>
+</form>
+{% endblock %}

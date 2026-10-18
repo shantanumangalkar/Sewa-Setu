@@ -455,6 +455,98 @@ def view_application(app_id):
     return render_template("application.html", a=row, app_id=app_id)
 
 
+@app.route("/application/<int:app_id>/edit", methods=["GET", "POST"])
+def edit_application(app_id):
+    if not session.get("logged_in"):
+        flash("Please login to edit your application.")
+        return redirect(url_for("status_login"))
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("SELECT application_no, applicant_name, mobile, dob, gender, "
+                "marital_status, husband_name, village, block, bank_account, ifsc, status "
+                "FROM applications WHERE id = %s", (app_id,))
+    row = cur.fetchone()
+    if not row:
+        cur.close(); conn.close()
+        abort(404)
+    # Authorization check: only admin or the application owner can edit
+    if not session.get("admin") and session.get("portal_mobile") != row[2]:
+        cur.close(); conn.close()
+        abort(403)
+    # Decided applications cannot be edited
+    if row[11] != "PENDING":
+        cur.close(); conn.close()
+        flash("Only pending applications can be edited. This application has already been decided.")
+        return redirect(url_for("view_application", app_id=app_id))
+
+    if request.method == "POST":
+        name = sanitize(request.form.get("applicant_name", ""))
+        dob_raw = request.form.get("dob", "").strip()
+        gender = request.form.get("gender", "")
+        marital = request.form.get("marital_status", "")
+        husband_name = request.form.get("husband_name", "").strip()
+        village = request.form.get("village", "").strip()
+        block = request.form.get("block", "").strip()
+        bank_account = request.form.get("bank_account", "").strip()
+        ifsc = request.form.get("ifsc", "").strip().upper()
+
+        if not name or not village or not block or not bank_account or not ifsc or not dob_raw:
+            flash("All required fields must be filled.")
+            cur.close(); conn.close()
+            return render_template("application_edit.html", a=row, app_id=app_id, blocks=BLOCKS)
+
+        dob = None
+        for fmt in ("%d/%m/%Y", "%Y-%m-%d", "%m/%d/%Y"):
+            try:
+                dob = datetime.strptime(dob_raw, fmt).date()
+                break
+            except ValueError:
+                continue
+        if dob is None:
+            flash("Invalid Date of Birth format. Please enter as DD/MM/YYYY.")
+            cur.close(); conn.close()
+            return render_template("application_edit.html", a=row, app_id=app_id, blocks=BLOCKS)
+
+        today = date.today()
+        age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+        if age < MIN_AGE:
+            flash("Applicant must be at least %d years of age to be eligible." % MIN_AGE)
+            cur.close(); conn.close()
+            return render_template("application_edit.html", a=row, app_id=app_id, blocks=BLOCKS)
+
+        # Update in-place: preserves single application rule, strictly prevents duplicates
+        cur.execute(
+            """UPDATE applications
+               SET applicant_name = %s, dob = %s, gender = %s, marital_status = %s,
+                   husband_name = %s, village = %s, block = %s, bank_account = %s, ifsc = %s
+               WHERE id = %s AND status = 'PENDING'""",
+            (name, dob, gender, marital, husband_name, village, block, bank_account, ifsc, app_id)
+        )
+        # Update portal login password to match corrected date of birth
+        new_pass = dob.strftime("%d%m%Y")
+        cur.execute("UPDATE portal_users SET password_hash = %s WHERE mobile = %s",
+                    (hash_password(new_pass), row[2]))
+        conn.commit()
+
+        # Refresh cached PDF acknowledgment if it was already generated
+        try:
+            ack_file = os.path.join(UPLOAD_DIR, "ack", "%d.pdf" % app_id)
+            if os.path.exists(ack_file):
+                pdf_bytes = generate_acknowledgment(cur, app_id)
+                with open(ack_file, "wb") as out:
+                    out.write(pdf_bytes)
+        except Exception as e:
+            app.logger.error("error refreshing ack pdf: %s" % e)
+
+        cur.close(); conn.close()
+        send_sms(row[2], "Sewa Setu: your application %s details have been updated." % row[0])
+        flash("Application details updated successfully.")
+        return redirect(url_for("view_application", app_id=app_id))
+
+    cur.close(); conn.close()
+    return render_template("application_edit.html", a=row, app_id=app_id, blocks=BLOCKS)
+
+
 @app.route("/ack/<int:app_id>.pdf")
 def ack_pdf(app_id):
     # Enforce authentication: prevent public scraping of citizen bank accounts and PII
