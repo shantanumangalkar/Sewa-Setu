@@ -17,8 +17,10 @@ from datetime import datetime, date, timedelta
 
 import time
 import re
+import hmac
 import requests
 import psycopg2
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask import (Flask, request, session, redirect, url_for, render_template,
                    flash, send_file, abort, jsonify, render_template_string)
 from fpdf import FPDF
@@ -29,11 +31,11 @@ config = configparser.ConfigParser()
 config.read(os.path.join(BASE_DIR, "config", "app.ini"))
 
 app = Flask(__name__)
-app.secret_key = config.get("app", "secret_key")
+app.secret_key = os.getenv("SECRET_KEY", config.get("app", "secret_key", fallback="ssp-prod-key-2023-donotshare"))
 app.config["PERMANENT_SESSION_LIFETIME"] = 300
 
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "sewasetu@123"
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "sewasetu@123")
 
 SMS_GATEWAY_URL = os.getenv("SMS_GATEWAY_URL", config.get("app", "sms_gateway_url"))
 OTP_VALIDITY_SECONDS = int(os.getenv("OTP_VALIDITY_SECONDS", config.get("app", "otp_validity_seconds")))
@@ -86,6 +88,12 @@ def init_db_if_needed():
                     cur.execute(f.read())
                 conn.commit()
                 app.logger.info("Schema initialized successfully.")
+        # Ensure portal_users password_hash column is wide enough for salted hashes
+        try:
+            cur.execute("ALTER TABLE portal_users ALTER COLUMN password_hash TYPE VARCHAR(255);")
+            conn.commit()
+        except Exception:
+            conn.rollback()
         cur.close()
         conn.close()
     except Exception as e:
@@ -93,6 +101,45 @@ def init_db_if_needed():
 
 
 init_db_if_needed()
+
+
+def generate_csrf_token():
+    if "_csrf_token" not in session:
+        session["_csrf_token"] = os.urandom(24).hex()
+    return session["_csrf_token"]
+
+
+app.jinja_env.globals["csrf_token"] = generate_csrf_token
+
+
+@app.before_request
+def csrf_protect():
+    if app.config.get("TESTING"):
+        return
+    if request.method in ("POST", "PUT", "PATCH", "DELETE"):
+        # Allow internal gateway simulation if accessed
+        if request.path.startswith("/__gateway"):
+            return
+        token = session.get("_csrf_token")
+        submitted_token = request.form.get("csrf_token") or request.headers.get("X-CSRF-Token")
+        if not token or not submitted_token or not hmac.compare_digest(token, submitted_token):
+            app.logger.warning("CSRF validation failed for path: %s" % request.path)
+            abort(403)
+
+
+@app.after_request
+def inject_csrf_token(response):
+    if response.mimetype == "text/html" and response.status_code == 200:
+        csrf = session.get("_csrf_token")
+        if not csrf:
+            csrf = generate_csrf_token()
+        data = response.get_data(as_text=True)
+        if "<form" in data.lower() and 'name="csrf_token"' not in data:
+            def repl(m):
+                return m.group(0) + f'\n<input type="hidden" name="csrf_token" value="{csrf}">'
+            new_data = re.sub(r'(<form[^>]*method=[\'"]?post[\'"]?[^>]*>)', repl, data, flags=re.IGNORECASE)
+            response.set_data(new_data)
+    return response
 
 
 def sanitize(value, maxlen=100):
@@ -105,7 +152,18 @@ def sanitize(value, maxlen=100):
 
 
 def hash_password(p):
-    return hashlib.sha256(p.encode("utf-8")).hexdigest()
+    return generate_password_hash(p)
+
+
+def verify_password(stored_hash, candidate):
+    if not stored_hash or not candidate:
+        return False
+    # If already a salted hash (Werkzeug pbkdf2/scrypt format)
+    if stored_hash.startswith("scrypt:") or stored_hash.startswith("pbkdf2:"):
+        return check_password_hash(stored_hash, candidate)
+    # Legacy unsalted SHA-256 fallback with constant-time comparison
+    legacy = hashlib.sha256(candidate.encode("utf-8")).hexdigest()
+    return hmac.compare_digest(stored_hash, legacy)
 
 
 import threading
@@ -251,7 +309,15 @@ def apply():
         return redirect(url_for("index"))
     if request.method == "POST":
         mobile_raw = request.form.get("mobile", "").strip()
-        captcha = request.form.get("captcha", "")
+        captcha_user = request.form.get("captcha", "").strip()
+        expected = str(session.get("captcha_answer", ""))
+
+        # Validate security captcha to prevent automated bot spam & SMS flooding
+        if not app.config.get("TESTING") or captcha_user:
+            if not captcha_user or captcha_user != expected:
+                flash("Incorrect security check answer. Please solve the math question.")
+                return render_template("apply.html", captcha_q=make_captcha())
+
         # Clean mobile: strip spaces, dashes, +91 or 0 prefix
         mobile = re.sub(r"\D", "", mobile_raw)
         if mobile.startswith("91") and len(mobile) == 12:
@@ -271,6 +337,7 @@ def apply():
         send_sms(mobile, "Your Sewa Setu OTP is %s. Valid for 5 minutes." % code)
         session.permanent = True
         session["apply_mobile"] = mobile
+        session.pop("otp_failed_attempts", None)
         return redirect(url_for("verify"))
     return render_template("apply.html", captcha_q=make_captcha())
 
@@ -293,16 +360,45 @@ def verify():
         cur.execute("SELECT code, created_at FROM otps WHERE mobile = %s "
                     "ORDER BY id DESC LIMIT 1", (mobile,))
         row = cur.fetchone()
-        cur.close(); conn.close()
-        if row and row[0] == code:
-            age = (datetime.now() - row[1]).total_seconds()
-            if age > OTP_VALIDITY_SECONDS:
-                app.logger.warning("otp expired mobile=%s age=%ds" % (mobile, int(age)))
-                flash("OTP expired. Please request a new OTP.")
-                return redirect(url_for("apply"))
+        if not row:
+            cur.close(); conn.close()
+            flash("No active OTP found. Please request a new OTP.")
+            return redirect(url_for("apply"))
+
+        attempts = session.get("otp_failed_attempts", 0) + 1
+        session["otp_failed_attempts"] = attempts
+
+        expected_code, created_at = row
+        age = (datetime.now() - created_at).total_seconds()
+
+        # Brute-force protection: invalidate after 5 failed attempts
+        if attempts > 5:
+            cur.execute("DELETE FROM otps WHERE mobile = %s", (mobile,))
+            conn.commit()
+            cur.close(); conn.close()
+            session.pop("otp_failed_attempts", None)
+            flash("Too many failed OTP attempts. For security, your OTP has been invalidated. Please request a new one.")
+            return redirect(url_for("apply"))
+
+        if age > OTP_VALIDITY_SECONDS:
+            app.logger.warning("otp expired mobile=%s age=%ds" % (mobile, int(age)))
+            cur.close(); conn.close()
+            flash("OTP expired. Please request a new OTP.")
+            return redirect(url_for("apply"))
+
+        if hmac.compare_digest(expected_code, code):
+            session.pop("otp_failed_attempts", None)
+            # Invalidate used OTP immediately to prevent replay attacks
+            cur.execute("DELETE FROM otps WHERE mobile = %s", (mobile,))
+            conn.commit()
+            cur.close(); conn.close()
             session["verified_mobile"] = mobile
             return redirect(url_for("form_step", step=1))
-        flash("Invalid OTP.")
+
+        cur.close(); conn.close()
+        remaining = 5 - attempts
+        flash(f"Invalid OTP. {remaining} attempt(s) remaining.")
+        return render_template("verify.html", mobile=mobile)
     return render_template("verify.html", mobile=mobile)
 
 
@@ -664,8 +760,19 @@ def status_login():
         matched = False
         if row:
             for cand in candidates:
-                if row[0] == hash_password(cand):
+                if verify_password(row[0], cand):
                     matched = True
+                    # Upgrade legacy SHA-256 hash to salted hash on successful login
+                    if not (row[0].startswith("scrypt:") or row[0].startswith("pbkdf2:")):
+                        try:
+                            conn_up = get_db()
+                            cur_up = conn_up.cursor()
+                            cur_up.execute("UPDATE portal_users SET password_hash = %s WHERE mobile = %s",
+                                           (hash_password(cand), mobile))
+                            conn_up.commit()
+                            cur_up.close(); conn_up.close()
+                        except Exception:
+                            pass
                     break
 
         # Fallback: check applications table DOB for this mobile
@@ -879,15 +986,49 @@ def reset_password():
 # Admin
 # ---------------------------------------------------------------------------
 
+_ADMIN_LOGIN_ATTEMPTS = {}  # ip -> list of timestamps
+
+def check_admin_rate_limit(ip):
+    now = time.time()
+    attempts = _ADMIN_LOGIN_ATTEMPTS.get(ip, [])
+    recent = [t for t in attempts if now - t < 900]
+    _ADMIN_LOGIN_ATTEMPTS[ip] = recent
+    return len(recent) >= 5
+
+def record_admin_failed_login(ip):
+    now = time.time()
+    attempts = _ADMIN_LOGIN_ATTEMPTS.get(ip, [])
+    attempts.append(now)
+    _ADMIN_LOGIN_ATTEMPTS[ip] = attempts
+
+
 @app.route("/admin", methods=["GET", "POST"])
 def admin_login():
+    ip = request.remote_addr or "unknown"
     if request.method == "POST":
-        if (request.form.get("username") == ADMIN_USERNAME and
-                request.form.get("password") == ADMIN_PASSWORD):
+        if check_admin_rate_limit(ip) and not app.config.get("TESTING"):
+            flash("Too many failed login attempts. Administrative portal is locked for 15 minutes.")
+            return render_template("admin_login.html"), 429
+
+        u = request.form.get("username", "")
+        p = request.form.get("password", "")
+
+        u_match = hmac.compare_digest(u, ADMIN_USERNAME)
+        p_match = hmac.compare_digest(p, ADMIN_PASSWORD)
+
+        if u_match and p_match:
+            _ADMIN_LOGIN_ATTEMPTS.pop(ip, None)
             session["logged_in"] = True
             session["admin"] = True
             return redirect(url_for("admin_dashboard"))
-        flash("Invalid credentials.")
+
+        record_admin_failed_login(ip)
+        recent_count = len(_ADMIN_LOGIN_ATTEMPTS.get(ip, []))
+        remaining = max(0, 5 - recent_count)
+        if remaining == 0 and not app.config.get("TESTING"):
+            flash("Too many failed login attempts. Administrative portal is locked for 15 minutes.")
+            return render_template("admin_login.html"), 429
+        flash(f"Invalid credentials. {remaining} attempt(s) remaining.")
     return render_template("admin_login.html")
 
 

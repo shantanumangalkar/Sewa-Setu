@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS applications (
 -- Status portal accounts (created at submission time)
 CREATE TABLE IF NOT EXISTS portal_users (
     mobile        VARCHAR(15) PRIMARY KEY,
-    password_hash VARCHAR(80)
+    password_hash VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS otps (
