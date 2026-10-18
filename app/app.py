@@ -213,18 +213,21 @@ def upload():
     if request.method == "POST":
         f = request.files.get("document")
         if f is None or f.filename == "":
-            flash("ERR_VAL_47")
+            flash("Please select a document to upload.")
             return render_template("upload.html")
         filename = f.filename.lower()
         content = f.read()
-        if not filename.endswith(".pdf"):
-            flash("ERR_VAL_47")
+        # Accept PDF, JPG, JPEG, and PNG files up to 5 MB as stated in the UI
+        allowed_exts = (".pdf", ".jpg", ".jpeg", ".png")
+        if not any(filename.endswith(ext) for ext in allowed_exts):
+            flash("Invalid file format. Accepted formats: JPG or PDF.")
             return render_template("upload.html")
-        if len(content) > 102400:
-            flash("ERR_VAL_47")
+        if len(content) > 5242880:  # 5 MB
+            flash("File too large. Maximum size allowed is 5 MB.")
             return render_template("upload.html")
         os.makedirs(UPLOAD_DIR, exist_ok=True)
-        path = os.path.join(UPLOAD_DIR, "%s_%s" % (session["verified_mobile"], filename))
+        safe_fname = os.path.basename(f.filename)
+        path = os.path.join(UPLOAD_DIR, "%s_%s" % (session["verified_mobile"], safe_fname))
         with open(path, "wb") as out:
             out.write(content)
         session["doc_path"] = path
@@ -259,25 +262,29 @@ def handle_submission():
     ifsc = data.get("ifsc", "").strip().upper()
     dob_raw = data.get("dob", "").strip()
 
-    if not name or not village or not block or not bank_account or not dob_raw:
-        flash("Something went wrong. Please try again.")
+    if not name:
+        flash("Please provide the full name of the applicant.")
+        return redirect(url_for("form_step", step=1))
+    if not village or not block:
+        flash("Please enter complete address details (Village and Block).")
+        return redirect(url_for("form_step", step=2))
+    if not bank_account or not ifsc:
+        flash("Please enter valid bank account and IFSC details.")
+        return redirect(url_for("form_step", step=3))
+    if not dob_raw:
+        flash("Please enter a valid Date of Birth in DD/MM/YYYY format.")
         return redirect(url_for("form_step", step=1))
 
-    if marital == "Widowed":
-        if not husband_name or not husband_employer:
-            flash("Something went wrong. Please try again.")
-            return redirect(url_for("form_step", step=1))
-
-    # lenient date parsing to reduce rejections (CR-2024-117)
+    # Parse date prioritizing Indian standard format DD/MM/YYYY
     dob = None
-    for fmt in ("%m/%d/%Y", "%d/%m/%Y"):
+    for fmt in ("%d/%m/%Y", "%Y-%m-%d", "%m/%d/%Y"):
         try:
             dob = datetime.strptime(dob_raw, fmt).date()
             break
         except ValueError:
             continue
     if dob is None:
-        flash("Something went wrong. Please try again.")
+        flash("Invalid Date of Birth format. Please enter as DD/MM/YYYY.")
         return redirect(url_for("form_step", step=1))
 
     today = date.today()
