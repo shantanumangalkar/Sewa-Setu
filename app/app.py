@@ -15,6 +15,7 @@ import hashlib
 import configparser
 from datetime import datetime, date, timedelta
 
+import re
 import requests
 import psycopg2
 from flask import (Flask, request, session, redirect, url_for, render_template,
@@ -413,12 +414,59 @@ def status_login():
     if request.method == "POST":
         mobile = request.form.get("mobile", "").strip()
         password = request.form.get("password", "")
+
+        # Candidate passwords to support natural variations in DOB entry
+        # (e.g. DDMMYYYY, DD/MM/YYYY, DD-MM-YYYY, YYYY-MM-DD, spaces, swapped month/day)
+        candidates = set()
+        if password:
+            candidates.add(password)
+            candidates.add(password.strip())
+            clean = re.sub(r"[^0-9a-zA-Z]", "", password)
+            if clean:
+                candidates.add(clean)
+                if len(clean) == 8 and clean.isdigit():
+                    # DDMMYYYY <-> MMDDYYYY
+                    candidates.add(clean[2:4] + clean[0:2] + clean[4:])
+                    # YYYYMMDD -> DDMMYYYY
+                    candidates.add(clean[6:8] + clean[4:6] + clean[0:4])
+                    # DDMMYYYY -> YYYYMMDD
+                    candidates.add(clean[4:8] + clean[2:4] + clean[0:2])
+
         conn = get_db()
         cur = conn.cursor()
         cur.execute("SELECT password_hash FROM portal_users WHERE mobile = %s", (mobile,))
         row = cur.fetchone()
         cur.close(); conn.close()
-        if row and row[0] == hash_password(password):
+
+        matched = False
+        if row:
+            for cand in candidates:
+                if row[0] == hash_password(cand):
+                    matched = True
+                    break
+
+        # Fallback: check applications table DOB for this mobile
+        if not matched and mobile:
+            conn = get_db()
+            cur = conn.cursor()
+            cur.execute("SELECT dob FROM applications WHERE mobile = %s ORDER BY submitted_at DESC LIMIT 1", (mobile,))
+            app_row = cur.fetchone()
+            cur.close(); conn.close()
+            if app_row and app_row[0]:
+                expected_dob = app_row[0].strftime("%d%m%Y")
+                if any(cand == expected_dob for cand in candidates):
+                    matched = True
+                    conn = get_db()
+                    cur = conn.cursor()
+                    cur.execute("""
+                        INSERT INTO portal_users (mobile, password_hash)
+                        VALUES (%s, %s)
+                        ON CONFLICT (mobile) DO UPDATE SET password_hash = EXCLUDED.password_hash
+                    """, (mobile, hash_password(expected_dob)))
+                    conn.commit()
+                    cur.close(); conn.close()
+
+        if matched:
             session["logged_in"] = True
             session["portal_mobile"] = mobile
             conn = get_db()
@@ -431,7 +479,7 @@ def status_login():
                 return redirect(url_for("view_application", app_id=r[0]))
             flash("No application found for this mobile number.")
             return redirect(url_for("status_login"))
-        flash("Something went wrong. Please try again.")
+        flash("Invalid mobile number or password. Default password is your Date of Birth in DDMMYYYY format (e.g. 15081958).")
     return render_template("status_login.html")
 
 
