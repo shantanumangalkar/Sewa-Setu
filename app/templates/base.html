@@ -5,32 +5,286 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sewa Setu - Old Age Pension Portal</title>
 <style>
-body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f0f2f5;color:#222}
-.header{background:#0b3d6e;color:#fff;padding:14px 28px}
-.header h1{margin:0;font-size:22px}
-.header .sub{font-size:13px;color:#cfe0f3}
-.band{background:#f7931e;height:5px}
-.container{max-width:860px;margin:24px auto;background:#fff;padding:28px;
-border:1px solid #d7dbe0;box-shadow:0 1px 3px rgba(0,0,0,.08)}
-.btn{background:#0b3d6e;color:#fff;border:none;padding:10px 22px;font-size:15px;cursor:pointer}
-.btn:hover{background:#0d4a85}
-label{display:block;margin:12px 0 4px;font-weight:bold;font-size:14px}
-input[type=text],input[type=password],select{width:100%;max-width:420px;padding:8px;
-border:1px solid #aab;font-size:14px}
-.flash{background:#fdecea;border:1px solid #e57373;color:#a33;padding:10px 14px;margin:14px 0}
-.note{font-size:13px;color:#555}
-.footer{max-width:860px;margin:10px auto 40px;font-size:12px;color:#666;text-align:center}
-.footer a{color:#0b3d6e;margin:0 8px}
-table.tbl{border-collapse:collapse;width:100%}
-table.tbl td,table.tbl th{border:1px solid #ccd;padding:7px 10px;font-size:14px;text-align:left}
-.steps{font-size:13px;color:#777;margin-bottom:18px}
-.steps b{color:#0b3d6e}
+/* Modern CSS Box-Sizing & Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f1f5f9;
+  color: #1e293b;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Header & Tricolor Accent */
+.header-wrap {
+  background: #0b3d6e;
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+.header {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 18px 24px;
+}
+.header h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: #ffffff;
+}
+.header .sub {
+  font-size: 13px;
+  color: #cfe0f3;
+  margin-top: 4px;
+  font-weight: 400;
+}
+.band {
+  background: linear-gradient(90deg, #f7931e 0%, #ffffff 50%, #138808 100%);
+  height: 4px;
+  width: 100%;
+}
+
+/* Main Container Card */
+.container {
+  max-width: 900px;
+  margin: 28px auto;
+  background: #ffffff;
+  padding: 32px 36px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Headings */
+h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 10px;
+}
+h3 {
+  margin-top: 24px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Step Progress Indicator */
+.steps {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 22px;
+  background: #f8fafc;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  line-height: 1.4;
+}
+.steps b {
+  color: #0b3d6e;
+  font-weight: 700;
+}
+
+/* Form Controls & Alignment */
+form {
+  margin: 0;
+}
+label {
+  display: block;
+  margin: 16px 0 6px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #334155;
+}
+label:first-of-type {
+  margin-top: 4px;
+}
+input[type=text],
+input[type=tel],
+input[type=password],
+input[type=email],
+input[type=number],
+input[type=file],
+select {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  padding: 10px 12px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 15px;
+  color: #0f172a;
+  background-color: #ffffff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+input[type=text]:focus,
+input[type=tel]:focus,
+input[type=password]:focus,
+input[type=email]:focus,
+input[type=number]:focus,
+input[type=file]:focus,
+select:focus {
+  outline: none;
+  border-color: #0b3d6e;
+  box-shadow: 0 0 0 3px rgba(11, 61, 110, 0.15);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #0b3d6e;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 22px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.btn:hover {
+  background: #0d4a85;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Flash Notifications */
+.flash {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-left: 4px solid #ef4444;
+  color: #991b1b;
+  padding: 12px 16px;
+  margin: 0 0 20px 0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Notes & Text */
+.note {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.5;
+}
+ol.note {
+  padding-left: 20px;
+}
+ol.note li {
+  margin-bottom: 6px;
+}
+
+/* Tables */
+table.tbl {
+  border-collapse: collapse;
+  width: 100%;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 16px;
+}
+table.tbl th {
+  background: #f8fafc;
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 13px;
+  border: 1px solid #e2e8f0;
+  padding: 10px 14px;
+  text-align: left;
+}
+table.tbl td {
+  border: 1px solid #e2e8f0;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #334155;
+  text-align: left;
+}
+table.tbl tr:nth-child(even) {
+  background: #f8fafc;
+}
+table.tbl tr:hover {
+  background: #f1f5f9;
+}
+
+/* Footer */
+.footer {
+  max-width: 900px;
+  margin: 16px auto 48px;
+  font-size: 12px;
+  color: #64748b;
+  text-align: center;
+  padding: 0 16px;
+  line-height: 1.8;
+}
+.footer a {
+  color: #0b3d6e;
+  text-decoration: none;
+  margin: 0 6px;
+}
+.footer a:hover {
+  text-decoration: underline;
+}
+
+/* Mobile & Tablet Responsiveness */
+@media (max-width: 768px) {
+  .container {
+    margin: 16px 12px;
+    padding: 20px 16px;
+    width: auto;
+  }
+  .header {
+    padding: 16px;
+  }
+  .header h1 {
+    font-size: 20px;
+  }
+  input[type=text],
+  input[type=tel],
+  input[type=password],
+  input[type=email],
+  input[type=number],
+  input[type=file],
+  select {
+    max-width: 100%;
+    font-size: 16px; /* Prevents auto-zoom in mobile Safari */
+  }
+  .btn {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 8px;
+  }
+  table.tbl {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
 </style>
 </head>
 <body>
-<div class="header">
-  <h1>Sewa Setu &mdash; Old Age Pension Portal</h1>
-  <div class="sub">Department of Social Welfare &middot; Government of Purvanchal</div>
+<div class="header-wrap">
+  <div class="header">
+    <h1>Sewa Setu &mdash; Old Age Pension Portal</h1>
+    <div class="sub">Department of Social Welfare &middot; Government of Purvanchal</div>
+  </div>
 </div>
 <div class="band"></div>
 <div class="container">
@@ -45,7 +299,7 @@ table.tbl td,table.tbl th{border:1px solid #ccd;padding:7px 10px;font-size:14px;
   <a href="/grievance">Grievance Cell</a> |
   <a href="http://swd.purvanchal.nic.in/pension-rules-2019.pdf">Pension Rules 2019</a> |
   <a href="/contact">Contact Us</a><br>
-  Site designed &amp; developed by Netlink Infosolutions Pvt Ltd. Best viewed in 1024x768.
+  Site designed &amp; developed by Netlink Infosolutions Pvt Ltd.
 </div>
 </body>
 </html>
