@@ -17,6 +17,14 @@ services:
     depends_on:
       - db
       - smsgw
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: sewasetu
+      DB_USER: sewasetu
+      DB_PASSWORD: sewasetu123
+      SMS_GATEWAY_URL: http://smsgw:8025
+      UPLOAD_DIR: /var/sewasetu/uploads
     volumes:
       - uploads:/var/sewasetu/uploads
       - applogs:/var/log/sewasetu
@@ -26,6 +34,13 @@ services:
     command: ["cron", "-f"]
     depends_on:
       - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: sewasetu
+      DB_USER: sewasetu
+      DB_PASSWORD: sewasetu123
+      SMS_GATEWAY_URL: http://smsgw:8025
     volumes:
       - applogs:/var/log/sewasetu
 

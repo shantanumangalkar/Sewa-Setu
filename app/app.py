@@ -34,13 +34,13 @@ app.config["PERMANENT_SESSION_LIFETIME"] = 300
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "sewasetu@123"
 
-SMS_GATEWAY_URL = config.get("app", "sms_gateway_url")
-OTP_VALIDITY_SECONDS = config.getint("app", "otp_validity_seconds")
-UPLOAD_DIR = config.get("app", "upload_dir")
-SCHEME_DEADLINE = datetime.strptime(config.get("pension", "scheme_deadline"),
+SMS_GATEWAY_URL = os.getenv("SMS_GATEWAY_URL", config.get("app", "sms_gateway_url"))
+OTP_VALIDITY_SECONDS = int(os.getenv("OTP_VALIDITY_SECONDS", config.get("app", "otp_validity_seconds")))
+UPLOAD_DIR = os.getenv("UPLOAD_DIR", config.get("app", "upload_dir"))
+SCHEME_DEADLINE = datetime.strptime(os.getenv("SCHEME_DEADLINE", config.get("pension", "scheme_deadline")),
                                     "%Y-%m-%d %H:%M")
-MIN_AGE = config.getint("pension", "min_age")
-SLA_DAYS = config.getint("pension", "sla_days")
+MIN_AGE = int(os.getenv("MIN_AGE", config.get("pension", "min_age")))
+SLA_DAYS = int(os.getenv("SLA_DAYS", config.get("pension", "sla_days")))
 
 BLOCKS = ["Sonari", "Rajapara", "Dhemaji Pathar", "Borgaon", "Namti", "Khelua"]
 
