@@ -143,10 +143,16 @@ def apply():
         flash("The application window for this scheme has closed.")
         return redirect(url_for("index"))
     if request.method == "POST":
-        mobile = request.form.get("mobile", "").strip()
+        mobile_raw = request.form.get("mobile", "").strip()
         captcha = request.form.get("captcha", "")
-        if len(mobile) != 10 or not mobile.isdigit():
-            flash("Something went wrong. Please try again.")
+        # Clean mobile: strip spaces, dashes, +91 or 0 prefix
+        mobile = re.sub(r"\D", "", mobile_raw)
+        if mobile.startswith("91") and len(mobile) == 12:
+            mobile = mobile[2:]
+        elif mobile.startswith("0") and len(mobile) == 11:
+            mobile = mobile[1:]
+        if len(mobile) != 10 or not mobile.isdigit() or mobile[0] not in "6789":
+            flash("Please enter a valid 10-digit Indian mobile number.")
             return render_template("apply.html", captcha_q=make_captcha())
         code = str(random.randint(100000, 999999))
         conn = get_db()
@@ -297,7 +303,7 @@ def handle_submission():
     today = date.today()
     age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
     if age < MIN_AGE:
-        flash("Applicant must be above %d years of age to be eligible." % MIN_AGE)
+        flash("Applicant must be at least %d years of age to be eligible." % MIN_AGE)
         return redirect(url_for("form_step", step=1))
 
     if datetime.now() > SCHEME_DEADLINE:

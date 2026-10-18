@@ -4,7 +4,7 @@
 <h2>Mobile Verification</h2>
 <form method="post">
   <label>Mobile Number</label>
-  <input type="text" name="mobile" maxlength="10" placeholder="10 digit mobile number">
+  <input type="tel" name="mobile" inputmode="numeric" maxlength="14" placeholder="10-digit mobile number (e.g. 9876543210)">
   <label>Security Check: What is {{ captcha_q }}?</label>
   <input type="text" name="captcha" style="max-width:120px">
   <p><button class="btn" type="submit">Send OTP</button></p>
