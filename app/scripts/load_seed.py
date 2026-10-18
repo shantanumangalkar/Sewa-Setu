@@ -12,6 +12,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROOT_DIR = os.path.dirname(BASE_DIR)
 
 def get_connection():
+    if len(sys.argv) > 1 and ("postgres" in sys.argv[1]):
+        target_url = sys.argv[1].strip().strip("'\"")
+        if target_url.startswith("postgres://"):
+            target_url = target_url.replace("postgres://", "postgresql://", 1)
+        print("Connecting to cloud database from command line argument...")
+        return psycopg2.connect(target_url)
+
     db_url = os.getenv("DATABASE_URL")
     if db_url:
         if db_url.startswith("postgres://"):
