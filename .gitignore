@@ -1,0 +1,20 @@
+# Large data files (as permitted by BRIEF.md)
+seed/seed.sql
+logs/*.tar.gz
+logs/*.log
+dc-briefing.mp3
+
+# Runtime uploads and logs
+uploads/
+/var/sewasetu/
+/var/log/sewasetu/
+*.log
+
+# Python cache & virtualenv
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.env
+venv/
+env/
