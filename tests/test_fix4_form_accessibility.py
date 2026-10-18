@@ -125,3 +125,32 @@ def test_widow_submission_does_not_require_deceased_husband_employer(client):
     conn.commit()
     cur.close()
     conn.close()
+
+
+def test_friendly_mobile_normalization_and_error_message(client):
+    """
+    Citizens frequently enter mobile numbers formatted with country code (+91),
+    leading zero, or spaces. The application must normalize these formats instead
+    of rejecting with generic errors. If invalid, a clear polite error must be shown.
+    """
+    # 1. Test invalid mobile gives friendly error message, not generic 'Something went wrong'
+    res_invalid = client.post("/apply", data={"mobile": "12345"})
+    assert res_invalid.status_code == 200
+    assert b"Please enter a valid 10-digit" in res_invalid.data or b"valid 10-digit" in res_invalid.data
+
+    # 2. Test +91 formatted mobile normalizes and succeeds
+    res_plus91 = client.post("/apply", data={"mobile": "+91 9999900014"})
+    assert res_plus91.status_code == 302
+    assert "/verify" in res_plus91.headers.get("Location", "")
+    with client.session_transaction() as sess:
+        assert sess.get("apply_mobile") == "9999900014"
+
+    # Cleanup any OTP created for 9999900014
+    from app.app import get_db
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM otps WHERE mobile = '9999900014'")
+    conn.commit()
+    cur.close()
+    conn.close()
+
