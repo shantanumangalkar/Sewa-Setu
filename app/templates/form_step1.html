@@ -1,34 +1,75 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="steps"><b>Step 2 of 6:</b> Personal Details</div>
-<h2>Personal Details</h2>
-<form method="post">
-  <label>Full Name of Applicant (as per age proof document)</label>
-  <input type="text" name="applicant_name" value="{{ data.get('applicant_name','') }}">
-  <label>Date of Birth (DD/MM/YYYY)</label>
-  <input type="text" name="dob" placeholder="DD/MM/YYYY (e.g. 15/08/1958)" value="{{ data.get('dob','') }}">
-  <p class="note" style="margin:2px 0 10px;font-size:12px;color:#0b3d6e;">
-    Applicant must be at least 60 years old on the date of application.
+<div class="steps">
+  <span style="color:#16a34a;">&#10003; Mobile Verified</span> &rsaquo;
+  <b>Step 2 of 6:</b>
+  <span style="color:#0b3d6e;font-weight:bold;">Personal Details</span> &rsaquo;
+  <span>Address</span> &rsaquo;
+  <span>Bank Details</span> &rsaquo;
+  <span>Document Upload</span> &rsaquo;
+  <span>Declaration</span>
+</div>
+
+<h2>Personal Details of Applicant</h2>
+
+<p class="note" style="margin-bottom:20px;">
+  Please ensure applicant information matches the identity and age proof documents to prevent processing delays.
+</p>
+
+<form method="post" style="max-width:680px;">
+  <div style="margin-bottom:18px;">
+    <label for="applicant_name">Full Name of Applicant (as per age proof document) <span style="color:#b91c1c;">*</span></label>
+    <input type="text" id="applicant_name" name="applicant_name" value="{{ data.get('applicant_name','') }}" placeholder="e.g. Ramesh Chandra Kalita" required style="max-width:100%;">
+  </div>
+
+  <div style="margin-bottom:18px;">
+    <label for="dob">Date of Birth (DD/MM/YYYY) <span style="color:#b91c1c;">*</span></label>
+    <input type="text" id="dob" name="dob" placeholder="DD/MM/YYYY (e.g. 15/08/1958)" value="{{ data.get('dob','') }}" required style="max-width:320px;">
+    <p class="note" style="margin:4px 0 0;font-size:12.5px;color:#0b3d6e;">
+      &#9432; Applicant must be at least 60 years old on the date of application.
+    </p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:16px;margin-bottom:18px;">
+    <div>
+      <label for="gender">Gender <span style="color:#b91c1c;">*</span></label>
+      <select id="gender" name="gender" required style="max-width:100%;">
+        <option value="">--Select Gender--</option>
+        <option {% if data.get('gender')=='Male' %}selected{% endif %}>Male</option>
+        <option {% if data.get('gender')=='Female' %}selected{% endif %}>Female</option>
+        <option {% if data.get('gender')=='Other' %}selected{% endif %}>Other</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="marital_status">Marital Status <span style="color:#b91c1c;">*</span></label>
+      <select id="marital_status" name="marital_status" required style="max-width:100%;">
+        <option value="">--Select Marital Status--</option>
+        <option {% if data.get('marital_status')=='Married' %}selected{% endif %}>Married</option>
+        <option {% if data.get('marital_status')=='Unmarried' %}selected{% endif %}>Unmarried</option>
+        <option {% if data.get('marital_status')=='Widowed' %}selected{% endif %}>Widowed</option>
+      </select>
+    </div>
+  </div>
+
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:18px;border-radius:8px;margin-top:22px;margin-bottom:22px;">
+    <h3 style="margin-top:0;margin-bottom:12px;font-size:15px;color:#0b3d6e;">Spouse Information (If Applicable)</h3>
+    <div style="margin-bottom:14px;">
+      <label for="husband_name" style="margin-top:0;">Husband's Name <span style="font-weight:normal;color:#64748b;">(Only for married female applicants)</span></label>
+      <input type="text" id="husband_name" name="husband_name" value="{{ data.get('husband_name','') }}" placeholder="Spouse's full name" style="max-width:100%;">
+    </div>
+
+    <div>
+      <label for="husband_employer">Husband's Current Employer <span style="font-weight:normal;color:#64748b;">(Optional; leave blank if widowed, unmarried, or retired)</span></label>
+      <input type="text" id="husband_employer" name="husband_employer" value="{{ data.get('husband_employer','') }}" placeholder="Employer name or leave blank" style="max-width:100%;">
+    </div>
+  </div>
+
+  <p class="note" style="color:#64748b;font-size:13px;">Fields marked with <span style="color:#b91c1c;">*</span> are mandatory.</p>
+
+  <p style="margin-top:24px;">
+    <button class="btn" type="submit">Save &amp; Continue &rsaquo;</button>
   </p>
-  <label>Gender</label>
-  <select name="gender">
-    <option value="">--Select--</option>
-    <option {% if data.get('gender')=='Male' %}selected{% endif %}>Male</option>
-    <option {% if data.get('gender')=='Female' %}selected{% endif %}>Female</option>
-    <option {% if data.get('gender')=='Other' %}selected{% endif %}>Other</option>
-  </select>
-  <label>Marital Status</label>
-  <select name="marital_status">
-    <option value="">--Select--</option>
-    <option {% if data.get('marital_status')=='Married' %}selected{% endif %}>Married</option>
-    <option {% if data.get('marital_status')=='Unmarried' %}selected{% endif %}>Unmarried</option>
-    <option {% if data.get('marital_status')=='Widowed' %}selected{% endif %}>Widowed</option>
-  </select>
-  <label>Husband's Name <span style="font-weight:normal;color:#666;">(Only for married female applicants)</span></label>
-  <input type="text" name="husband_name" value="{{ data.get('husband_name','') }}">
-  <label>Husband's Current Employer <span style="font-weight:normal;color:#666;">(Optional; leave blank if widowed, unmarried, or retired)</span></label>
-  <input type="text" name="husband_employer" value="{{ data.get('husband_employer','') }}">
-  <p class="note">Fields marked above are mandatory as applicable.</p>
-  <p><button class="btn" type="submit">Save &amp; Continue</button></p>
 </form>
 {% endblock %}
+

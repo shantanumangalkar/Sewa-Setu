@@ -1,55 +1,92 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Correct Application Details &mdash; {{ a[0] }}</h2>
-<p class="note" style="background:#e8f4fd;padding:10px;border-left:4px solid #0b3d6e;margin-bottom:16px;">
+
+<div class="info-banner" style="background:#e8f4fd;padding:14px 18px;border-left:4px solid #0b3d6e;border-radius:6px;margin-bottom:24px;">
   <strong>Notice:</strong> You can correct typos or inaccurate details while your application is under review.
   Corrections update your existing application directly without creating duplicate records.
-</p>
+</div>
 
-<form method="post">
-  <label>Full Name of Applicant</label>
-  <input type="text" name="applicant_name" value="{{ a[1] }}" required>
+<form method="post" style="max-width:720px;">
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:22px;margin-bottom:20px;">
+    <h3 style="margin-top:0;margin-bottom:14px;color:#0b3d6e;font-size:16px;">1. Applicant Identity &amp; Demographics</h3>
+    
+    <div style="margin-bottom:16px;">
+      <label for="applicant_name" style="margin-top:0;">Full Name of Applicant <span style="color:#b91c1c;">*</span></label>
+      <input type="text" id="applicant_name" name="applicant_name" value="{{ a[1] }}" required style="max-width:100%;">
+    </div>
 
-  <label>Date of Birth (DD/MM/YYYY)</label>
-  <input type="text" name="dob" value="{{ a[3].strftime('%d/%m/%Y') if a[3] else '' }}" placeholder="DD/MM/YYYY" required>
+    <div style="margin-bottom:16px;">
+      <label for="dob">Date of Birth (DD/MM/YYYY) <span style="color:#b91c1c;">*</span></label>
+      <input type="text" id="dob" name="dob" value="{{ a[3].strftime('%d/%m/%Y') if a[3] else '' }}" placeholder="DD/MM/YYYY" required style="max-width:280px;">
+    </div>
 
-  <label>Gender</label>
-  <select name="gender">
-    <option value="Male" {% if a[4]=='Male' %}selected{% endif %}>Male</option>
-    <option value="Female" {% if a[4]=='Female' %}selected{% endif %}>Female</option>
-    <option value="Other" {% if a[4]=='Other' %}selected{% endif %}>Other</option>
-  </select>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:16px;margin-bottom:16px;">
+      <div>
+        <label for="gender" style="margin-top:0;">Gender <span style="color:#b91c1c;">*</span></label>
+        <select id="gender" name="gender" style="max-width:100%;">
+          <option value="Male" {% if a[4]=='Male' %}selected{% endif %}>Male</option>
+          <option value="Female" {% if a[4]=='Female' %}selected{% endif %}>Female</option>
+          <option value="Other" {% if a[4]=='Other' %}selected{% endif %}>Other</option>
+        </select>
+      </div>
 
-  <label>Marital Status</label>
-  <select name="marital_status">
-    <option value="Married" {% if a[5]=='Married' %}selected{% endif %}>Married</option>
-    <option value="Unmarried" {% if a[5]=='Unmarried' %}selected{% endif %}>Unmarried</option>
-    <option value="Widowed" {% if a[5]=='Widowed' %}selected{% endif %}>Widowed</option>
-  </select>
+      <div>
+        <label for="marital_status" style="margin-top:0;">Marital Status <span style="color:#b91c1c;">*</span></label>
+        <select id="marital_status" name="marital_status" style="max-width:100%;">
+          <option value="Married" {% if a[5]=='Married' %}selected{% endif %}>Married</option>
+          <option value="Unmarried" {% if a[5]=='Unmarried' %}selected{% endif %}>Unmarried</option>
+          <option value="Widowed" {% if a[5]=='Widowed' %}selected{% endif %}>Widowed</option>
+        </select>
+      </div>
+    </div>
 
-  <label>Husband's Name (if applicable)</label>
-  <input type="text" name="husband_name" value="{{ a[6] or '' }}">
+    <div>
+      <label for="husband_name">Husband's Name (if applicable)</label>
+      <input type="text" id="husband_name" name="husband_name" value="{{ a[6] or '' }}" placeholder="Spouse name" style="max-width:100%;">
+    </div>
+  </div>
 
-  <label>Village / Town</label>
-  <input type="text" name="village" value="{{ a[7] }}" required>
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:22px;margin-bottom:20px;">
+    <h3 style="margin-top:0;margin-bottom:14px;color:#0b3d6e;font-size:16px;">2. Residential Address</h3>
+    
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:16px;">
+      <div>
+        <label for="village" style="margin-top:0;">Village / Town <span style="color:#b91c1c;">*</span></label>
+        <input type="text" id="village" name="village" value="{{ a[7] }}" required style="max-width:100%;">
+      </div>
 
-  <label>Block</label>
-  <select name="block" required>
-    {% for b in blocks %}
-    <option {% if a[8]==b %}selected{% endif %}>{{ b }}</option>
-    {% endfor %}
-  </select>
+      <div>
+        <label for="block" style="margin-top:0;">Block <span style="color:#b91c1c;">*</span></label>
+        <select id="block" name="block" required style="max-width:100%;">
+          {% for b in blocks %}
+          <option {% if a[8]==b %}selected{% endif %}>{{ b }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
 
-  <label>Bank Account Number</label>
-  <input type="text" name="bank_account" value="{{ a[9] }}" required>
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:22px;margin-bottom:24px;">
+    <h3 style="margin-top:0;margin-bottom:14px;color:#0b3d6e;font-size:16px;">3. Bank Disbursement Account</h3>
+    
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:16px;">
+      <div>
+        <label for="bank_account" style="margin-top:0;">Bank Account Number <span style="color:#b91c1c;">*</span></label>
+        <input type="text" id="bank_account" name="bank_account" value="{{ a[9] }}" required style="max-width:100%;letter-spacing:1px;">
+      </div>
 
-  <label>IFSC Code</label>
-  <input type="text" name="ifsc" value="{{ a[10] }}" required>
+      <div>
+        <label for="ifsc" style="margin-top:0;">IFSC Code <span style="color:#b91c1c;">*</span></label>
+        <input type="text" id="ifsc" name="ifsc" value="{{ a[10] }}" required style="max-width:100%;text-transform:uppercase;letter-spacing:1.5px;font-weight:bold;">
+      </div>
+    </div>
+  </div>
 
-  <p style="margin-top:20px;">
-    <button class="btn" type="submit">Save Changes</button>
-    &nbsp;
-    <a href="/application/{{ app_id }}" class="note" style="margin-left:10px;">Cancel</a>
+  <p style="margin-top:24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+    <button class="btn btn-primary" type="submit" style="padding:11px 26px;">Save Changes</button>
+    <a href="/application/{{ app_id }}" class="btn btn-outline" style="text-decoration:none;padding:10px 20px;">Cancel</a>
   </p>
 </form>
 {% endblock %}
+

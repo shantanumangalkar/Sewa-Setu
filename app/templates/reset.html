@@ -1,9 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Reset Password</h2>
-<form method="post">
-  <label>Registered Mobile Number</label>
-  <input type="tel" name="mobile" inputmode="numeric" maxlength="14" placeholder="10-digit mobile number">
-  <p><button class="btn" type="submit">Reset Password</button></p>
-</form>
+
+<p class="note" style="margin-bottom:20px;">
+  Enter your registered mobile number. A temporary password or reset PIN will be dispatched via SMS.
+</p>
+
+<div style="max-width:440px;background:#ffffff;border:1px solid #d8e2ee;border-radius:8px;padding:24px;box-shadow:0 2px 8px rgba(11,61,110,0.06);">
+  <form method="post" style="margin:0;">
+    <div style="margin-bottom:18px;">
+      <label for="mobile" style="margin-top:0;">Registered Mobile Number <span style="color:#b91c1c;">*</span></label>
+      <input type="tel" id="mobile" name="mobile" inputmode="numeric" maxlength="14" placeholder="10-digit registered mobile number" required autofocus style="max-width:100%;">
+    </div>
+
+    <p style="margin:0;">
+      <button class="btn" type="submit" style="width:100%;padding:11px 20px;">Reset Password &rsaquo;</button>
+    </p>
+  </form>
+</div>
+
+<p class="note" style="margin-top:18px;">
+  <a href="/status" style="color:#0b3d6e;text-decoration:none;">&larr; Back to Login Portal</a>
+</p>
 {% endblock %}
+

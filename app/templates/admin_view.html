@@ -1,31 +1,79 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Application {{ a[0] }}</h2>
-<p><a href="/admin/applications">&laquo; Back to list</a></p>
-<table class="tbl" style="max-width:640px">
-  <tr><th>Applicant Name</th><td>{{ a[1] }}</td></tr>
-  <tr><th>Mobile</th><td>{{ a[2] }}</td></tr>
-  <tr><th>Date of Birth</th><td>{{ a[3] }}</td></tr>
-  <tr><th>Gender</th><td>{{ a[4] }}</td></tr>
-  <tr><th>Marital Status</th><td>{{ a[5] }}</td></tr>
-  <tr><th>Village</th><td>{{ a[6] }}</td></tr>
-  <tr><th>Block</th><td>{{ a[7] }}</td></tr>
-  <tr><th>Bank Account</th><td>{{ a[8] }}</td></tr>
-  <tr><th>IFSC</th><td>{{ a[9] }}</td></tr>
-  <tr><th>Document</th><td>{{ a[10] or '-' }}</td></tr>
-  <tr><th>Status</th><td><b>{{ a[11] }}</b></td></tr>
-  <tr><th>Submitted</th><td>{{ a[12] }}</td></tr>
-  <tr><th>Decided</th><td>{{ a[13] or '-' }} {{ a[14] or '' }}</td></tr>
-</table>
-{% if a[11] == 'PENDING' %}
-<p>
-<form method="post" action="/admin/approve/{{ app_id }}" style="display:inline">
-  <button class="btn" type="submit">Approve</button>
-</form>
-&nbsp;
-<form method="post" action="/admin/reject/{{ app_id }}" style="display:inline">
-  <button class="btn" style="background:#a33" type="submit">Reject</button>
-</form>
+<div style="margin-bottom:12px;">
+  <a href="/admin/applications" style="color:#0b3d6e;text-decoration:none;font-weight:600;font-size:13.5px;">&larr; Back to applications list</a>
+</div>
+
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:12px;">
+  <h2 style="margin:0;border:none;padding:0;">Application Dossier &mdash; {{ a[0] }}</h2>
+  <div>
+    <span class="badge-status {% if a[11]=='APPROVED' or a[11]=='DEEMED_APPROVED' %}badge-approved{% elif a[11]=='REJECTED' %}badge-rejected{% else %}badge-pending{% endif %}" style="font-size:13px;padding:6px 14px;">
+      {{ a[11] }}
+    </span>
+  </div>
+</div>
+
+<p class="note" style="margin-bottom:20px;">
+  Verify applicant identity, age proof eligibility, and bank details before submitting a final statutory decision.
 </p>
+
+<div class="table-responsive" style="max-width:700px;">
+  <table class="tbl">
+    <tbody>
+      <tr><th style="width:200px;">Applicant Name</th><td><strong style="font-size:15px;color:#0b3d6e;">{{ a[1] }}</strong></td></tr>
+      <tr><th>Mobile Number</th><td>{{ a[2] }}</td></tr>
+      <tr><th>Date of Birth</th><td>{{ a[3] }}</td></tr>
+      <tr><th>Gender</th><td>{{ a[4] }}</td></tr>
+      <tr><th>Marital Status</th><td>{{ a[5] }}</td></tr>
+      <tr><th>Village / Town</th><td>{{ a[6] }}</td></tr>
+      <tr><th>Block</th><td>{{ a[7] }}</td></tr>
+      <tr><th>Bank Account</th><td><span style="font-family:monospace;letter-spacing:1px;font-size:14px;">{{ a[8] }}</span></td></tr>
+      <tr><th>IFSC Code</th><td><span style="font-family:monospace;font-weight:bold;color:#0b3d6e;">{{ a[9] }}</span></td></tr>
+      <tr>
+        <th>Document Attachment</th>
+        <td>
+          {% if a[10] %}
+          <span style="display:inline-flex;align-items:center;gap:6px;background:#f1f5f9;border:1px solid #cbd5e1;padding:4px 10px;border-radius:4px;font-size:13px;">
+            &#128196; <strong>{{ a[10] }}</strong>
+          </span>
+          {% else %}
+          <span style="color:#94a3b8;">None attached</span>
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>Current Status</th>
+        <td>
+          <span class="badge-status {% if a[11]=='APPROVED' or a[11]=='DEEMED_APPROVED' %}badge-approved{% elif a[11]=='REJECTED' %}badge-rejected{% else %}badge-pending{% endif %}">
+            <b>{{ a[11] }}</b>
+          </span>
+        </td>
+      </tr>
+      <tr><th>Submitted At</th><td>{{ a[12] }}</td></tr>
+      <tr><th>Decided At / Officer</th><td>{{ a[13] or '-' }} {{ a[14] or '' }}</td></tr>
+    </tbody>
+  </table>
+</div>
+
+{% if a[11] == 'PENDING' %}
+<div style="background:#f8fafc;border:1px solid #e2e8f0;padding:20px;border-radius:8px;max-width:700px;margin-top:24px;">
+  <h3 style="margin-top:0;margin-bottom:12px;font-size:15px;color:#0b3d6e;">Officer Action &amp; Statutory Determination</h3>
+  <p class="note" style="margin-top:0;margin-bottom:16px;">
+    Decisions recorded here are legally binding under the Purvanchal Right to Public Services Act.
+  </p>
+  <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
+    <form method="post" action="/admin/approve/{{ app_id }}" style="display:inline;margin:0;">
+      <button class="btn btn-success" type="submit" style="padding:10px 24px;">
+        &#10003; Approve Application
+      </button>
+    </form>
+    <form method="post" action="/admin/reject/{{ app_id }}" style="display:inline;margin:0;">
+      <button class="btn btn-danger" type="submit" style="padding:10px 24px;">
+        &#10007; Reject Application
+      </button>
+    </form>
+  </div>
+</div>
 {% endif %}
 {% endblock %}
+

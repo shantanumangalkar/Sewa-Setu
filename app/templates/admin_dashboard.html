@@ -1,38 +1,104 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Admin Dashboard</h2>
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
+  <h2 style="margin:0;border:none;padding:0;">Departmental Officer Dashboard</h2>
+  <span style="background:#eaf2fa;color:#0b3d6e;font-size:12.5px;font-weight:bold;padding:4px 12px;border-radius:20px;border:1px solid #bfdbfe;">
+    Purvanchal Social Assistance Programme
+  </span>
+</div>
 
 <!-- Candidate Search Bar -->
-<div style="background:#f4f6f9;padding:16px 20px;border-radius:6px;border:1px solid #dcdfe4;margin-bottom:20px;">
-  <h3 style="margin:0 0 10px;font-size:16px;color:#0b3d6e;">Find Candidate / Application</h3>
-  <form method="get" action="/admin/applications" style="display:flex;gap:10px;flex-wrap:wrap;">
-    <input type="text" name="q" placeholder="Search by Candidate Name, Application No, Mobile Number, or Bank Account..." style="flex:1;min-width:280px;padding:9px 12px;font-size:14px;border:1px solid #aab;border-radius:4px;">
-    <button class="btn" type="submit">Search Candidate</button>
+<div style="background:linear-gradient(135deg, #f8fafc 0%, #edf4fc 100%);padding:20px 24px;border-radius:8px;border:1px solid #cbd5e1;border-left:5px solid #0b3d6e;margin-bottom:24px;box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+  <h3 style="margin:0 0 10px;font-size:16px;color:#0b3d6e;display:flex;align-items:center;gap:6px;">
+    <span>&#128269;</span>
+    <span>Find Candidate / Application</span>
+  </h3>
+  <form method="get" action="/admin/applications" style="display:flex;gap:10px;flex-wrap:wrap;margin:0;">
+    <input type="text" name="q" placeholder="Search by Candidate Name, Application No, Mobile Number, or Bank Account..." style="flex:1;min-width:280px;padding:10px 14px;font-size:14px;border:1.5px solid #cbd5e1;border-radius:6px;background:#ffffff;">
+    <button class="btn" type="submit" style="padding:10px 22px;">Search Candidate</button>
   </form>
 </div>
 
-<p>
-  <strong>Filter by Status:</strong> &nbsp;
-  <a href="/admin/applications?status=PENDING">Pending</a> |
-  <a href="/admin/applications?status=APPROVED">Approved</a> |
-  <a href="/admin/applications?status=REJECTED">Rejected</a> |
-  <a href="/admin/applications?status=DEEMED_APPROVED">Deemed Approved</a> |
-  <a href="/admin/applications">All Applications</a>
-</p>
+<!-- Quick Status Filter Pills -->
+<div style="background:#f8fafc;border:1px solid #e2e8f0;padding:12px 18px;border-radius:8px;margin-bottom:24px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
+  <strong style="color:#0b3d6e;font-size:13.5px;margin-right:6px;">Filter by Status:</strong>
+  <a href="/admin/applications?status=PENDING" style="text-decoration:none;"><span class="badge-status badge-pending" style="font-size:12px;padding:5px 12px;cursor:pointer;">Pending</span></a>
+  <a href="/admin/applications?status=APPROVED" style="text-decoration:none;"><span class="badge-status badge-approved" style="font-size:12px;padding:5px 12px;cursor:pointer;">Approved</span></a>
+  <a href="/admin/applications?status=REJECTED" style="text-decoration:none;"><span class="badge-status badge-rejected" style="font-size:12px;padding:5px 12px;cursor:pointer;">Rejected</span></a>
+  <a href="/admin/applications?status=DEEMED_APPROVED" style="text-decoration:none;"><span class="badge-status badge-deemed" style="font-size:12px;padding:5px 12px;cursor:pointer;">Deemed Approved</span></a>
+  <a href="/admin/applications" class="btn btn-outline" style="font-size:12.5px;padding:4px 12px;min-height:30px;margin-left:auto;">View All Applications &rsaquo;</a>
+</div>
 
-<h3>Applications by Status</h3>
-<table class="tbl" style="max-width:400px">
-{% for s, c in by_status %}
-<tr><td>{{ s }}</td><td style="text-align:right">{{ c }}</td></tr>
-{% endfor %}
-</table>
+<!-- SLA Overdue Alert Banner -->
+{% if overdue and overdue > 0 %}
+<div style="background:#fee2e2;border:1px solid #fecaca;border-left:5px solid #ef4444;padding:14px 18px;border-radius:8px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span style="font-size:22px;color:#dc2626;">&#9888;</span>
+    <div>
+      <h3 style="color:#991b1b;margin:0;font-size:15.5px;">Pending beyond {{ sla }}-day SLA: {{ overdue }}</h3>
+      <div style="font-size:12.5px;color:#b91c1c;margin-top:2px;">Applications exceeding the statutory deadline will automatically transition to Deemed Approval.</div>
+    </div>
+  </div>
+  <a href="/admin/applications?status=PENDING" style="text-decoration:none;"><button class="btn btn-danger" style="padding:6px 14px;font-size:13px;min-height:34px;">Review Overdue &rsaquo;</button></a>
+</div>
+{% else %}
+<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-left:5px solid #16a34a;padding:12px 18px;border-radius:8px;margin-bottom:24px;display:flex;align-items:center;gap:10px;">
+  <span style="font-size:18px;color:#16a34a;">&#10003;</span>
+  <div style="font-size:14px;color:#15803d;font-weight:bold;">
+    Pending beyond {{ sla }}-day SLA: {{ overdue }}
+    <span style="font-weight:normal;font-size:13px;margin-left:6px;color:#166534;">(All pending applications are within the statutory processing window)</span>
+  </div>
+</div>
+{% endif %}
 
-<h3 style="color:#a33">Pending beyond {{ sla }}-day SLA: {{ overdue }}</h3>
+<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:24px;margin-top:10px;">
+  <!-- Status Breakdown Card -->
+  <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+    <h3 style="margin-top:0;font-size:16px;color:#0b3d6e;display:flex;align-items:center;justify-content:space-between;">
+      <span>Applications by Status</span>
+      <span style="font-size:12px;font-weight:normal;color:#64748b;">Current Count</span>
+    </h3>
+    <div class="table-responsive" style="margin:10px 0 0;border:none;">
+      <table class="tbl">
+        <tbody>
+        {% for s, c in by_status %}
+        <tr>
+          <td>
+            <a href="/admin/applications?status={{ s }}" style="text-decoration:none;color:#1e293b;font-weight:600;">
+              <span class="badge-status {% if s=='APPROVED' or s=='DEEMED_APPROVED' %}badge-approved{% elif s=='REJECTED' %}badge-rejected{% else %}badge-pending{% endif %}" style="font-size:11.5px;padding:3px 10px;">
+                {{ s }}
+              </span>
+            </a>
+          </td>
+          <td style="text-align:right;font-weight:bold;font-size:15px;color:#0b3d6e;">{{ c }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-<h3>Pending by Block</h3>
-<table class="tbl" style="max-width:400px">
-{% for b, c in by_block %}
-<tr><td>{{ b }}</td><td style="text-align:right">{{ c }}</td></tr>
-{% endfor %}
-</table>
+  <!-- Block Breakdown Card -->
+  <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+    <h3 style="margin-top:0;font-size:16px;color:#0b3d6e;display:flex;align-items:center;justify-content:space-between;">
+      <span>Pending by Block</span>
+      <span style="font-size:12px;font-weight:normal;color:#64748b;">Pending Queue</span>
+    </h3>
+    <div class="table-responsive" style="margin:10px 0 0;border:none;">
+      <table class="tbl">
+        <tbody>
+        {% for b, c in by_block %}
+        <tr>
+          <td style="font-weight:500;">{{ b }}</td>
+          <td style="text-align:right;font-weight:bold;color:#b45309;">
+            <span style="background:#fef3c7;padding:2px 8px;border-radius:12px;font-size:13px;">{{ c }}</span>
+          </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 {% endblock %}
+

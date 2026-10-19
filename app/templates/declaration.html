@@ -1,12 +1,42 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="steps"><b>Step 6 of 6:</b> Declaration</div>
-<h2>Declaration</h2>
-<p>I hereby declare that the information furnished above is true to the best of my
-knowledge and belief. I understand that furnishing false information is punishable
-under applicable law and will result in cancellation of pension.</p>
-<form method="post">
-  <p><input type="checkbox" required> I agree to the above declaration.</p>
-  <p><button class="btn" type="submit">Submit Application</button></p>
+<div class="steps">
+  <span style="color:#16a34a;">&#10003; Mobile</span> &rsaquo;
+  <span style="color:#16a34a;">&#10003; Personal</span> &rsaquo;
+  <span style="color:#16a34a;">&#10003; Address</span> &rsaquo;
+  <span style="color:#16a34a;">&#10003; Bank</span> &rsaquo;
+  <span style="color:#16a34a;">&#10003; Document</span> &rsaquo;
+  <b>Step 6 of 6:</b>
+  <span style="color:#0b3d6e;font-weight:bold;">Declaration</span>
+</div>
+
+<h2>Statutory Declaration &amp; Submission</h2>
+
+<div style="background:#fffbeb;border:1px solid #fef08a;border-left:5px solid #d97706;padding:20px;border-radius:8px;margin-bottom:24px;max-width:680px;">
+  <div style="font-weight:bold;color:#92400e;margin-bottom:8px;font-size:15px;display:flex;align-items:center;gap:6px;">
+    <span>&#9878;</span>
+    <span>Applicant Undertaking</span>
+  </div>
+  <p style="margin:0;color:#78350f;font-size:14px;line-height:1.65;">
+    I hereby declare that the information furnished above is true to the best of my
+    knowledge and belief. I understand that furnishing false information is punishable
+    under applicable law and will result in cancellation of pension.
+  </p>
+</div>
+
+<form method="post" style="max-width:680px;">
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:16px 20px;border-radius:8px;margin-bottom:24px;">
+    <label style="display:flex;align-items:center;cursor:pointer;font-weight:normal;margin:0;font-size:14.5px;color:#1e293b;">
+      <input type="checkbox" required style="width:20px;height:20px;accent-color:#0b3d6e;cursor:pointer;margin-right:12px;">
+      <strong>I agree to the above declaration and confirm all information is correct.</strong>
+    </label>
+  </div>
+
+  <p style="margin-top:20px;">
+    <button class="btn btn-success" type="submit" style="padding:12px 28px;font-size:15px;">
+      &#10003; Submit Application
+    </button>
+  </p>
 </form>
 {% endblock %}
+

@@ -1,12 +1,68 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>About the Scheme</h2>
-<p>The Old Age Pension Scheme is implemented by the Department of Social Welfare,
-Government of Purvanchal, under the State Social Assistance Programme.</p>
-<p>Eligibility: residents of Purvanchal above 60 years of age. One application per
-eligible citizen. Applications are processed within 15 days as per the Purvanchal
-Right to Public Services Act; applications not processed within the statutory
-period stand approved (deemed approval).</p>
-<p>Scheme guidelines: <a href="/downloads/oap-guidelines-2023.pdf">OAP Guidelines 2023 (PDF)</a></p>
-<p>Beneficiary list: <a href="http://swd.purvanchal.nic.in/oap/beneficiary-list">District-wise beneficiary list</a></p>
+<h2>About the Old Age Pension Scheme</h2>
+
+<div style="background:linear-gradient(135deg, #f8fafc 0%, #edf4fc 100%);border:1px solid #d8e2ef;border-left:5px solid #0b3d6e;border-radius:8px;padding:20px 24px;margin-bottom:24px;">
+  <p style="margin:0;font-size:15px;line-height:1.6;color:#1e293b;">
+    The Old Age Pension Scheme is implemented by the Department of Social Welfare,
+    Government of Purvanchal, under the State Social Assistance Programme.
+  </p>
+</div>
+
+<div class="features-grid">
+  <div class="feature-card">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+      <span style="font-size:20px;color:#0b3d6e;">&#128101;</span>
+      <strong style="color:#0b3d6e;font-size:15px;">Eligibility Criteria</strong>
+    </div>
+    <p style="margin:0;font-size:13.5px;color:#475569;line-height:1.55;">
+      Eligibility: residents of Purvanchal above 60 years of age. One application per eligible citizen.
+    </p>
+  </div>
+
+  <div class="feature-card">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+      <span style="font-size:20px;color:#0b3d6e;">&#9201;</span>
+      <strong style="color:#0b3d6e;font-size:15px;">Statutory 15-Day SLA</strong>
+    </div>
+    <p style="margin:0;font-size:13.5px;color:#475569;line-height:1.55;">
+      Applications are processed within 15 days as per the Purvanchal Right to Public Services Act; applications not processed within the statutory period stand approved (deemed approval).
+    </p>
+  </div>
+</div>
+
+<h3 style="margin-top:28px;border-bottom:1px solid #e2e8f0;padding-bottom:8px;">Official Documents &amp; Beneficiary Data</h3>
+
+<div style="display:flex;flex-direction:column;gap:12px;margin:16px 0 24px;">
+  <div style="background:#ffffff;border:1px solid #cbd5e1;padding:14px 18px;border-radius:6px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:20px;color:#b91c1c;">&#128196;</span>
+      <div>
+        <strong style="font-size:14px;color:#1e293b;">Scheme Guidelines</strong>
+        <div style="font-size:12.5px;color:#64748b;">Comprehensive operational rules and eligibility directives</div>
+      </div>
+    </div>
+    <a href="/downloads/oap-guidelines-2023.pdf" style="text-decoration:none;">
+      <button class="btn btn-outline" style="padding:6px 14px;font-size:13px;min-height:34px;">
+        OAP Guidelines 2023 (PDF) &rsaquo;
+      </button>
+    </a>
+  </div>
+
+  <div style="background:#ffffff;border:1px solid #cbd5e1;padding:14px 18px;border-radius:6px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:20px;color:#0b3d6e;">&#128203;</span>
+      <div>
+        <strong style="font-size:14px;color:#1e293b;">Public Beneficiary List</strong>
+        <div style="font-size:12.5px;color:#64748b;">Transparent block and panchayat level registry of pension recipients</div>
+      </div>
+    </div>
+    <a href="http://swd.purvanchal.nic.in/oap/beneficiary-list" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
+      <button class="btn btn-outline" style="padding:6px 14px;font-size:13px;min-height:34px;">
+        District-wise beneficiary list &rsaquo;
+      </button>
+    </a>
+  </div>
+</div>
 {% endblock %}
+

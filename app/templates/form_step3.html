@@ -1,14 +1,44 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="steps"><b>Step 4 of 6:</b> Bank Details</div>
+<div class="steps">
+  <span style="color:#16a34a;">&#10003; Mobile</span> &rsaquo;
+  <span style="color:#16a34a;">&#10003; Personal</span> &rsaquo;
+  <span style="color:#16a34a;">&#10003; Address</span> &rsaquo;
+  <b>Step 4 of 6:</b>
+  <span style="color:#0b3d6e;font-weight:bold;">Bank Details</span> &rsaquo;
+  <span>Document Upload</span> &rsaquo;
+  <span>Declaration</span>
+</div>
+
 <h2>Bank Details for Pension Disbursement</h2>
-<form method="post">
-  <label>Bank Account Number</label>
-  <input type="text" name="bank_account" value="{{ data.get('bank_account','') }}">
-  <label>IFSC Code</label>
-  <input type="text" name="ifsc" value="{{ data.get('ifsc','') }}">
-  <p class="note">Pension will be credited by DBT to this account. Ensure the account
-  is in the name of the applicant.</p>
-  <p><button class="btn" type="submit">Save &amp; Continue</button></p>
+
+<div style="background:#f0f9ff;border:1px solid #bae6fd;border-left:4px solid #0284c7;padding:16px 18px;border-radius:8px;margin-bottom:24px;">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span style="font-size:20px;color:#0369a1;">&#127974;</span>
+    <div style="font-size:14px;color:#0369a1;font-weight:bold;">Direct Benefit Transfer (DBT) Direct to Citizen</div>
+  </div>
+  <p class="note" style="margin:6px 0 0;color:#075985;font-size:13.5px;">
+    Pension will be credited by DBT to this account. Ensure the account is in the name of the applicant.
+  </p>
+</div>
+
+<form method="post" style="max-width:540px;">
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:20px;border-radius:8px;margin-bottom:24px;">
+    <div style="margin-bottom:18px;">
+      <label for="bank_account" style="margin-top:0;">Bank Account Number <span style="color:#b91c1c;">*</span></label>
+      <input type="text" id="bank_account" name="bank_account" value="{{ data.get('bank_account','') }}" placeholder="Enter full savings bank account number" required style="max-width:100%;letter-spacing:1px;font-weight:500;">
+    </div>
+
+    <div>
+      <label for="ifsc">IFSC Code <span style="color:#b91c1c;">*</span></label>
+      <input type="text" id="ifsc" name="ifsc" value="{{ data.get('ifsc','') }}" placeholder="e.g. SBIN0001234" maxlength="11" required style="max-width:280px;text-transform:uppercase;letter-spacing:1.5px;font-weight:bold;">
+      <div class="note" style="margin:4px 0 0;font-size:12px;">11-character code printed on the first page of your bank passbook.</div>
+    </div>
+  </div>
+
+  <p style="margin-top:20px;">
+    <button class="btn" type="submit">Save &amp; Continue &rsaquo;</button>
+  </p>
 </form>
 {% endblock %}
+

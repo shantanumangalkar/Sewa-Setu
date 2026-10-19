@@ -1,11 +1,40 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="steps"><b>Step 1 of 6:</b> Mobile Verification</div>
-<h2>Enter OTP</h2>
-<p class="note">An OTP has been sent to {{ mobile }}.</p>
-<form method="post">
-  <label>OTP</label>
-  <input type="text" name="otp" maxlength="6" style="max-width:160px">
-  <p><button class="btn" type="submit">Verify</button></p>
+<div class="steps">
+  <b>Step 1 of 6:</b>
+  <span style="color:#0b3d6e;font-weight:bold;">Mobile Verification</span> &rsaquo;
+  <span>Personal Details</span> &rsaquo;
+  <span>Address</span> &rsaquo;
+  <span>Bank Details</span> &rsaquo;
+  <span>Document Upload</span> &rsaquo;
+  <span>Declaration</span>
+</div>
+
+<h2>Enter One-Time Password (OTP)</h2>
+
+<div style="background:#f0f7ff;border:1px solid #bfdbfe;border-left:4px solid #0b3d6e;padding:14px 18px;border-radius:6px;margin-bottom:20px;max-width:540px;">
+  <p class="note" style="margin:0;color:#1e40af;font-size:14px;">
+    An OTP has been sent to <strong>{{ mobile }}</strong> by SMS.
+  </p>
+</div>
+
+<form method="post" style="max-width:440px;">
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:22px 20px;border-radius:8px;margin-bottom:20px;">
+    <label for="otp" style="margin-top:0;font-size:14px;color:#1e293b;">
+      Enter 6-Digit OTP <span style="color:#b91c1c;">*</span>
+    </label>
+    <div style="margin-top:8px;">
+      <input type="text" id="otp" name="otp" maxlength="6" inputmode="numeric" placeholder="&bull; &bull; &bull; &bull; &bull; &bull;" style="max-width:200px;font-size:22px;letter-spacing:8px;text-align:center;font-weight:bold;height:48px;" required autofocus autocomplete="one-time-code">
+    </div>
+    <div class="note" style="margin:8px 0 0;font-size:12.5px;color:#64748b;">
+      The OTP is valid for 5 minutes. Please check your SMS inbox.
+    </div>
+  </div>
+
+  <p style="margin-top:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+    <button class="btn" type="submit" style="min-width:140px;">Verify &rsaquo;</button>
+    <a href="/apply" class="note" style="margin:0;color:#0b3d6e;text-decoration:none;">&larr; Change Mobile Number</a>
+  </p>
 </form>
 {% endblock %}
+

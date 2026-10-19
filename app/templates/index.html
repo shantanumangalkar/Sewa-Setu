@@ -1,25 +1,106 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Welcome</h2>
-<p>The Old Age Pension Scheme provides a monthly pension of Rs. 250 to eligible
-senior citizens above 60 years of age who are residents of Purvanchal.</p>
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+  <span style="display:inline-flex;align-items:center;gap:6px;background:#eef5fc;color:#0b3d6e;padding:4px 12px;border-radius:20px;font-size:12.5px;font-weight:bold;border:1px solid #cce0f5;">
+    <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f7931e;"></span>
+    Indira Gandhi National Old Age Pension Scheme (IGNOAPS) &middot; Purvanchal
+  </span>
+  <span style="font-size:12.5px;color:#64748b;">Direct Benefit Transfer (DBT) Portal</span>
+</div>
+
+<h2>Welcome to Sewa Setu</h2>
+
+<div style="background:linear-gradient(135deg, #f8fafc 0%, #edf4fc 100%);border:1px solid #d8e2ef;border-left:5px solid #0b3d6e;border-radius:8px;padding:20px 24px;margin-bottom:24px;">
+  <p style="margin:0 0 10px;font-size:15.5px;line-height:1.6;color:#1e293b;font-weight:500;">
+    The Old Age Pension Scheme provides a monthly pension of <strong>Rs. 250</strong> to eligible
+    senior citizens above 60 years of age who are residents of Purvanchal.
+  </p>
+  <div style="display:inline-flex;align-items:center;gap:8px;background:#ffffff;border:1px solid #cbd5e1;padding:6px 14px;border-radius:6px;font-size:13px;color:#0b3d6e;font-weight:bold;">
+    <span>&#10003; 100% Paperless Application</span>
+    <span style="color:#94a3b8;">&bull;</span>
+    <span>&#10003; Direct Bank Transfer</span>
+    <span style="color:#94a3b8;">&bull;</span>
+    <span>&#10003; 15-Day Service Guarantee</span>
+  </div>
+</div>
+
 {% if hours_left is not none %}
-<p><b>Application window closes in approximately {{ hours_left }} hours</b>
-(midnight, 31 October).</p>
+<div style="display:flex;align-items:center;gap:12px;background:#fffbeb;border:1px solid #fef08a;border-left:5px solid #f59e0b;padding:14px 18px;border-radius:8px;margin-bottom:24px;">
+  <div style="font-size:22px;color:#d97706;line-height:1;">&#9200;</div>
+  <div>
+    <div style="font-size:14.5px;color:#92400e;font-weight:bold;">
+      Application window closes in approximately {{ hours_left }} hours
+    </div>
+    <div style="font-size:13px;color:#b45309;margin-top:2px;">
+      Final deadline: midnight, 31 October. Eligible applicants are requested to submit in advance.
+    </div>
+  </div>
+</div>
 {% else %}
-<p><b>The application window for this scheme has closed.</b></p>
+<div style="display:flex;align-items:center;gap:12px;background:#fef2f2;border:1px solid #fecaca;border-left:5px solid #ef4444;padding:14px 18px;border-radius:8px;margin-bottom:24px;">
+  <div style="font-size:20px;color:#dc2626;">&#9888;</div>
+  <div>
+    <p style="margin:0;font-weight:bold;color:#991b1b;"><b>The application window for this scheme has closed.</b></p>
+    <div style="font-size:13px;color:#b91c1c;margin-top:2px;">Existing applicants can track their status below.</div>
+  </div>
+</div>
 {% endif %}
-<p>
-  <a href="/apply"><button class="btn">Apply for Pension</button></a>
-  &nbsp;
-  <a href="/status"><button class="btn" style="background:#555">Check Application Status</button></a>
-</p>
-<h3>How to apply</h3>
-<ol class="note">
-  <li>Verify your mobile number with OTP.</li>
-  <li>Fill the application form (personal details, address, bank details).</li>
-  <li>Upload your age proof document (JPG or PDF, maximum 5 MB).</li>
-  <li>Submit the declaration. Note down your Application Number.</li>
-</ol>
-<p class="note">For assistance visit your nearest Block Development Office.</p>
+
+<div style="display:flex;gap:14px;flex-wrap:wrap;margin:24px 0 32px;">
+  <a href="/apply" style="text-decoration:none;"><button class="btn" style="padding:12px 28px;font-size:15px;">&#10010; Apply for Pension</button></a>
+  <a href="/status" style="text-decoration:none;"><button class="btn btn-secondary" style="background:#334155;padding:12px 26px;font-size:15px;">&#128269; Check Application Status</button></a>
+</div>
+
+<h3 style="border-bottom:1px solid #e2e8f0;padding-bottom:8px;margin-bottom:16px;">How to apply</h3>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:14px;margin-bottom:26px;">
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-top:3px solid #0b3d6e;border-radius:8px;padding:16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span style="background:#0b3d6e;color:#fff;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;">1</span>
+      <strong style="color:#0b3d6e;font-size:14px;">Mobile OTP</strong>
+    </div>
+    <div style="font-size:13px;color:#475569;line-height:1.45;">
+      Verify your mobile number with OTP. Instant verification ensures your application security.
+    </div>
+  </div>
+
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-top:3px solid #0b3d6e;border-radius:8px;padding:16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span style="background:#0b3d6e;color:#fff;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;">2</span>
+      <strong style="color:#0b3d6e;font-size:14px;">Citizen Details</strong>
+    </div>
+    <div style="font-size:13px;color:#475569;line-height:1.45;">
+      Fill the application form (personal details, address, bank details) accurately.
+    </div>
+  </div>
+
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-top:3px solid #0b3d6e;border-radius:8px;padding:16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span style="background:#0b3d6e;color:#fff;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;">3</span>
+      <strong style="color:#0b3d6e;font-size:14px;">Document Upload</strong>
+    </div>
+    <div style="font-size:13px;color:#475569;line-height:1.45;">
+      Upload your age proof document (JPG or PDF, maximum 5 MB) clearly showing your date of birth.
+    </div>
+  </div>
+
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-top:3px solid #f7931e;border-radius:8px;padding:16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span style="background:#f7931e;color:#fff;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;">4</span>
+      <strong style="color:#b45309;font-size:14px;">Acknowledgment</strong>
+    </div>
+    <div style="font-size:13px;color:#475569;line-height:1.45;">
+      Submit the declaration. Note down your Application Number and download PDF acknowledgment.
+    </div>
+  </div>
+</div>
+
+<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+  <span style="font-size:20px;color:#1d4ed8;">&#8505;</span>
+  <div style="flex:1;min-width:240px;font-size:13.5px;color:#1e40af;">
+    <strong>Need Assistance?</strong> For assistance visit your nearest Block Development Office or call the citizen helpline at <strong>1800-180-1555</strong>.
+  </div>
+  <a href="/about" style="text-decoration:none;"><button class="btn btn-outline" style="padding:6px 14px;font-size:13px;min-height:34px;">View Guidelines</button></a>
+</div>
 {% endblock %}
+

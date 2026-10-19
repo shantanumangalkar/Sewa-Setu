@@ -1,95 +1,116 @@
 {% extends "base.html" %}
 {% block content %}
-<p><a href="/admin/dashboard">&laquo; Back to Dashboard</a></p>
+<div style="margin-bottom:12px;">
+  <a href="/admin/dashboard" style="color:#0b3d6e;text-decoration:none;font-weight:600;font-size:13.5px;">&larr; Back to Dashboard</a>
+</div>
 
 <h2>
   {% if q %}
   Search Results for &ldquo;{{ q }}&rdquo;
-  <span style="font-size:15px;font-weight:normal;color:#666;">({{ total_count }} match{% if total_count != 1 %}es{% endif %} found)</span>
+  <span style="font-size:14px;font-weight:normal;color:#64748b;">({{ total_count }} match{% if total_count != 1 %}es{% endif %} found)</span>
   {% else %}
   Applications &mdash; {{ status or 'All' }}
-  <span style="font-size:15px;font-weight:normal;color:#666;">({{ total_count }} total)</span>
+  <span style="font-size:14px;font-weight:normal;color:#64748b;">({{ total_count }} total)</span>
   {% endif %}
 </h2>
 
 <!-- Search and Filter Bar -->
-<div style="background:#f4f6f9;padding:14px 18px;border-radius:6px;border:1px solid #dcdfe4;margin-bottom:18px;">
-  <form method="get" action="/admin/applications" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-    <input type="text" name="q" value="{{ q }}" placeholder="Search candidate by name, application no, mobile, bank account..." style="flex:1;min-width:260px;padding:8px 12px;font-size:14px;border:1px solid #aab;border-radius:4px;">
+<div style="background:#f8fafc;padding:16px 20px;border-radius:8px;border:1px solid #cbd5e1;margin-bottom:18px;">
+  <form method="get" action="/admin/applications" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0;">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search candidate by name, application no, mobile, bank account..." style="flex:1;min-width:260px;padding:9px 14px;font-size:14px;border:1.5px solid #cbd5e1;border-radius:6px;background:#ffffff;">
     {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
-    <button class="btn" type="submit">Search</button>
+    <button class="btn" type="submit" style="padding:9px 18px;min-height:38px;">Search</button>
     {% if q %}
-    <a href="/admin/applications{% if status %}?status={{ status }}{% endif %}" class="btn" style="background:#6c757d;text-decoration:none;display:inline-flex;align-items:center;padding:8px 14px;">Clear Search</a>
+    <a href="/admin/applications{% if status %}?status={{ status }}{% endif %}" class="btn btn-secondary" style="background:#64748b;text-decoration:none;display:inline-flex;align-items:center;padding:9px 16px;min-height:38px;">Clear Search</a>
     {% endif %}
   </form>
 </div>
 
 <!-- Status Filters -->
-<p style="margin:12px 0 16px;">
-  <strong>Filter:</strong> &nbsp;
-  <a href="/admin/applications?q={{ q }}" {% if not status %}style="font-weight:bold;text-decoration:underline;"{% endif %}>All</a> |
-  <a href="/admin/applications?status=PENDING&q={{ q }}" {% if status=='PENDING' %}style="font-weight:bold;text-decoration:underline;"{% endif %}>Pending</a> |
-  <a href="/admin/applications?status=APPROVED&q={{ q }}" {% if status=='APPROVED' %}style="font-weight:bold;text-decoration:underline;"{% endif %}>Approved</a> |
-  <a href="/admin/applications?status=REJECTED&q={{ q }}" {% if status=='REJECTED' %}style="font-weight:bold;text-decoration:underline;"{% endif %}>Rejected</a> |
-  <a href="/admin/applications?status=DEEMED_APPROVED&q={{ q }}" {% if status=='DEEMED_APPROVED' %}style="font-weight:bold;text-decoration:underline;"{% endif %}>Deemed Approved</a>
-</p>
+<div style="background:#f1f5f9;padding:10px 16px;border-radius:6px;border:1px solid #e2e8f0;margin:12px 0 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+  <strong style="color:#0b3d6e;font-size:13px;">Filter:</strong>
+  <a href="/admin/applications?q={{ q }}" style="text-decoration:none;">
+    <span class="badge-status" style="{% if not status %}background:#0b3d6e;color:#fff;{% else %}background:#e2e8f0;color:#334155;{% endif %}cursor:pointer;padding:4px 10px;">All</span>
+  </a>
+  <a href="/admin/applications?status=PENDING&q={{ q }}" style="text-decoration:none;">
+    <span class="badge-status badge-pending" style="{% if status=='PENDING' %}outline:2px solid #b45309;{% endif %}cursor:pointer;padding:4px 10px;">Pending</span>
+  </a>
+  <a href="/admin/applications?status=APPROVED&q={{ q }}" style="text-decoration:none;">
+    <span class="badge-status badge-approved" style="{% if status=='APPROVED' %}outline:2px solid #15803d;{% endif %}cursor:pointer;padding:4px 10px;">Approved</span>
+  </a>
+  <a href="/admin/applications?status=REJECTED&q={{ q }}" style="text-decoration:none;">
+    <span class="badge-status badge-rejected" style="{% if status=='REJECTED' %}outline:2px solid #b91c1c;{% endif %}cursor:pointer;padding:4px 10px;">Rejected</span>
+  </a>
+  <a href="/admin/applications?status=DEEMED_APPROVED&q={{ q }}" style="text-decoration:none;">
+    <span class="badge-status badge-deemed" style="{% if status=='DEEMED_APPROVED' %}outline:2px solid #0369a1;{% endif %}cursor:pointer;padding:4px 10px;">Deemed Approved</span>
+  </a>
+</div>
 
-<table class="tbl">
-<thead>
-  <tr>
-    <th>ID</th>
-    <th>Application No</th>
-    <th>Candidate Name</th>
-    <th>Mobile</th>
-    <th>Block</th>
-    <th>Status</th>
-    <th>Submitted</th>
-    <th>Action</th>
-  </tr>
-</thead>
-<tbody>
-{% if rows %}
-  {% for r in rows %}
-  <tr>
-    <td>{{ r[0] }}</td>
-    <td><strong>{{ r[1] }}</strong></td>
-    <td>{{ r[2] }}</td>
-    <td>{{ r[3] }}</td>
-    <td>{{ r[4] }}</td>
-    <td>
-      <span style="display:inline-block;padding:2px 8px;border-radius:3px;font-size:12px;font-weight:bold;
-        {% if r[5]=='APPROVED' or r[5]=='DEEMED_APPROVED' %}background:#d4edda;color:#155724;
-        {% elif r[5]=='REJECTED' %}background:#f8d7da;color:#721c24;
-        {% else %}background:#fff3cd;color:#856404;{% endif %}">
-        {{ r[5] }}
-      </span>
-    </td>
-    <td>{{ r[6].strftime('%d/%m/%Y %H:%M') if r[6] else '-' }}</td>
-    <td><a href="/admin/application/{{ r[0] }}"><button class="btn" style="padding:4px 10px;font-size:13px;">View</button></a></td>
-  </tr>
-  {% endfor %}
-{% else %}
-  <tr>
-    <td colspan="8" style="text-align:center;padding:24px;color:#666;">
-      No candidate applications found matching your criteria.
-    </td>
-  </tr>
-{% endif %}
-</tbody>
-</table>
+<div class="table-responsive">
+  <table class="tbl">
+  <thead>
+    <tr>
+      <th style="width:50px;">ID</th>
+      <th>Application No</th>
+      <th>Candidate Name</th>
+      <th>Mobile</th>
+      <th>Block</th>
+      <th>Status</th>
+      <th>Submitted</th>
+      <th style="text-align:center;">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% if rows %}
+    {% for r in rows %}
+    <tr>
+      <td style="color:#64748b;font-size:13px;">{{ r[0] }}</td>
+      <td><strong style="color:#0b3d6e;">{{ r[1] }}</strong></td>
+      <td style="font-weight:600;">{{ r[2] }}</td>
+      <td style="font-family:monospace;letter-spacing:0.5px;">{{ r[3] }}</td>
+      <td>{{ r[4] }}</td>
+      <td>
+        <span class="badge-status {% if r[5]=='APPROVED' or r[5]=='DEEMED_APPROVED' %}badge-approved{% elif r[5]=='REJECTED' %}badge-rejected{% else %}badge-pending{% endif %}">
+          {{ r[5] }}
+        </span>
+      </td>
+      <td style="font-size:13px;color:#475569;">{{ r[6].strftime('%d/%m/%Y %H:%M') if r[6] else '-' }}</td>
+      <td style="text-align:center;">
+        <a href="/admin/application/{{ r[0] }}" style="text-decoration:none;">
+          <button class="btn btn-primary" style="padding:5px 12px;font-size:12.5px;min-height:30px;box-shadow:none;">View &rsaquo;</button>
+        </a>
+      </td>
+    </tr>
+    {% endfor %}
+  {% else %}
+    <tr>
+      <td colspan="8" style="text-align:center;padding:32px 20px;color:#64748b;">
+        <div style="font-size:28px;margin-bottom:6px;">&#128269;</div>
+        <strong>No candidate applications found matching your criteria.</strong>
+        <div style="font-size:13px;margin-top:4px;">Try searching with a different mobile number, name, or application ID.</div>
+      </td>
+    </tr>
+  {% endif %}
+  </tbody>
+  </table>
+</div>
 
-<p style="margin-top:20px;">
-  {% if page > 1 %}
-  <a href="?status={{ status }}&q={{ q }}&page={{ page - 1 }}">&laquo; Previous Page</a>
-  {% endif %}
-  &nbsp;
-  {% if rows|length == 50 and (page * 50) < total_count %}
-  <a href="?status={{ status }}&q={{ q }}&page={{ page + 1 }}">Next Page &raquo;</a>
-  {% endif %}
+<div style="margin-top:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+  <div style="display:flex;gap:10px;align-items:center;">
+    {% if page > 1 %}
+    <a href="?status={{ status }}&q={{ q }}&page={{ page - 1 }}" class="btn btn-outline" style="text-decoration:none;padding:6px 14px;font-size:13px;min-height:34px;">&laquo; Previous Page</a>
+    {% endif %}
+    {% if rows|length == 50 and (page * 50) < total_count %}
+    <a href="?status={{ status }}&q={{ q }}&page={{ page + 1 }}" class="btn btn-outline" style="text-decoration:none;padding:6px 14px;font-size:13px;min-height:34px;">Next Page &raquo;</a>
+    {% endif %}
+  </div>
+
   {% if total_count > 0 %}
-  <span style="color:#777;font-size:13px;margin-left:14px;">
-    Page {{ page }} of {{ ((total_count - 1) // 50) + 1 }}
-  </span>
+  <div style="color:#64748b;font-size:13.5px;font-weight:500;">
+    Page <strong>{{ page }}</strong> of <strong>{{ ((total_count - 1) // 50) + 1 }}</strong>
+    <span style="color:#94a3b8;margin-left:4px;">({{ total_count }} total records)</span>
+  </div>
   {% endif %}
-</p>
+</div>
 {% endblock %}
+

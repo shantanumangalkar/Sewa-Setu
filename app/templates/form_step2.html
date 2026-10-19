@@ -1,17 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="steps"><b>Step 3 of 6:</b> Address Details</div>
-<h2>Address Details</h2>
-<form method="post">
-  <label>Village / Town</label>
-  <input type="text" name="village" value="{{ data.get('village','') }}">
-  <label>Block</label>
-  <select name="block">
-    <option value="">--Select--</option>
-    {% for b in blocks %}
-    <option {% if data.get('block')==b %}selected{% endif %}>{{ b }}</option>
-    {% endfor %}
-  </select>
-  <p><button class="btn" type="submit">Save &amp; Continue</button></p>
+<div class="steps">
+  <span style="color:#16a34a;">&#10003; Mobile</span> &rsaquo;
+  <span style="color:#16a34a;">&#10003; Personal Details</span> &rsaquo;
+  <b>Step 3 of 6:</b>
+  <span style="color:#0b3d6e;font-weight:bold;">Address Details</span> &rsaquo;
+  <span>Bank Details</span> &rsaquo;
+  <span>Document Upload</span> &rsaquo;
+  <span>Declaration</span>
+</div>
+
+<h2>Address &amp; Residential Location</h2>
+
+<p class="note" style="margin-bottom:20px;">
+  Applicant must be a permanent resident of Purvanchal. Enter your current residential village/town and administrative block.
+</p>
+
+<form method="post" style="max-width:540px;">
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:20px;border-radius:8px;margin-bottom:24px;">
+    <div style="margin-bottom:18px;">
+      <label for="village" style="margin-top:0;">Village / Town <span style="color:#b91c1c;">*</span></label>
+      <input type="text" id="village" name="village" value="{{ data.get('village','') }}" placeholder="e.g. Sonari Gaon" required style="max-width:100%;">
+    </div>
+
+    <div>
+      <label for="block">Block <span style="color:#b91c1c;">*</span></label>
+      <select id="block" name="block" required style="max-width:100%;">
+        <option value="">--Select Administrative Block--</option>
+        {% for b in blocks %}
+        <option {% if data.get('block')==b %}selected{% endif %}>{{ b }}</option>
+        {% endfor %}
+      </select>
+      <div class="note" style="margin:4px 0 0;font-size:12px;">Select the Block Development Office overseeing your locality.</div>
+    </div>
+  </div>
+
+  <p style="margin-top:20px;">
+    <button class="btn" type="submit">Save &amp; Continue &rsaquo;</button>
+  </p>
 </form>
 {% endblock %}
+

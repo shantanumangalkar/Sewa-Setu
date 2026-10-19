@@ -3,49 +3,803 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sewa Setu - Old Age Pension Portal</title>
+<title>Sewa Setu - Old Age Pension Portal | Government of Purvanchal</title>
 <style>
-body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#f0f2f5;color:#222}
-.header{background:#0b3d6e;color:#fff;padding:14px 28px}
-.header h1{margin:0;font-size:22px}
-.header .sub{font-size:13px;color:#cfe0f3}
-.band{background:#f7931e;height:5px}
-.container{max-width:860px;margin:24px auto;background:#fff;padding:28px;
-border:1px solid #d7dbe0;box-shadow:0 1px 3px rgba(0,0,0,.08)}
-.btn{background:#0b3d6e;color:#fff;border:none;padding:10px 22px;font-size:15px;cursor:pointer}
-.btn:hover{background:#0d4a85}
-label{display:block;margin:12px 0 4px;font-weight:bold;font-size:14px}
-input[type=text],input[type=password],input[type=tel],select{width:100%;max-width:420px;padding:9px 12px;
-border:1px solid #aab;font-size:15px;box-sizing:border-box;border-radius:3px}
-.flash{background:#fdecea;border:1px solid #e57373;color:#a33;padding:10px 14px;margin:14px 0}
-.note{font-size:13px;color:#555}
-.footer{max-width:860px;margin:10px auto 40px;font-size:12px;color:#666;text-align:center}
-.footer a{color:#0b3d6e;margin:0 8px}
-table.tbl{border-collapse:collapse;width:100%}
-table.tbl td,table.tbl th{border:1px solid #ccd;padding:7px 10px;font-size:14px;text-align:left}
-.steps{font-size:13px;color:#777;margin-bottom:18px}
-.steps b{color:#0b3d6e}
+/* ==========================================================================
+   SEWA SETU DESIGN SYSTEM - PROFESSIONAL GOVERNMENT PORTAL
+   TYPOGRAPHY PRESERVED: Strictly Arial, Helvetica, sans-serif
+   ========================================================================== */
+:root {
+  --gov-blue: #0b3d6e;
+  --gov-blue-dark: #072646;
+  --gov-blue-light: #165696;
+  --gov-saffron: #f7931e;
+  --gov-saffron-dark: #d97706;
+  --gov-green: #138808;
+  --gov-green-light: #eaf7ea;
+  --text-dark: #1e293b;
+  --text-body: #334155;
+  --text-muted: #64748b;
+  --bg-body: #f1f4f9;
+  --bg-card: #ffffff;
+  --border-light: #d8e0ea;
+  --border-focus: #0b3d6e;
+  --danger: #b91c1c;
+  --danger-bg: #fef2f2;
+  --danger-border: #fecaca;
+  --warning: #b45309;
+  --warning-bg: #fffbeb;
+  --warning-border: #fef08a;
+  --success: #15803d;
+  --success-bg: #f0fdf4;
+  --success-border: #bbf7d0;
+  --info: #0369a1;
+  --info-bg: #f0f9ff;
+  --info-border: #bae6fd;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px -2px rgba(11,61,110,0.08), 0 2px 6px -1px rgba(0,0,0,0.04);
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-body);
+  color: var(--text-body);
+  line-height: 1.55;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- Accessibility & Focus Styles --- */
+a:focus, button:focus, input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--gov-saffron);
+  outline-offset: 2px;
+}
+
+/* --- Government Tricolor Top Ribbon --- */
+.top-tricolor {
+  height: 4px;
+  background: linear-gradient(90deg, #f7931e 0%, #f7931e 33.3%, #ffffff 33.3%, #ffffff 66.6%, #138808 66.6%, #138808 100%);
+  width: 100%;
+}
+
+/* --- Official Top Utility Bar --- */
+.top-utility-bar {
+  background: #072646;
+  color: #cfe0f3;
+  padding: 6px 20px;
+  font-size: 11.5px;
+  letter-spacing: 0.3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.top-utility-bar .gov-identity {
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.top-utility-bar .gov-identity span.flag-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--gov-saffron);
+}
+
+.top-utility-bar .utility-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.top-utility-bar .utility-links a {
+  color: #cbd5e1;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.top-utility-bar .utility-links a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.top-utility-bar .helpline-badge {
+  background: rgba(247, 147, 30, 0.18);
+  border: 1px solid var(--gov-saffron);
+  color: #ffedd5;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-weight: bold;
+}
+
+/* --- Main Brand Header --- */
+.header {
+  background: linear-gradient(135deg, #072646 0%, #0b3d6e 55%, #104a82 100%);
+  color: #ffffff;
+  padding: 16px 24px;
+  box-shadow: 0 2px 8px rgba(7, 38, 70, 0.15);
+}
+
+.header-container {
+  max-width: 1060px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.emblem-wrapper {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: -0.2px;
+  line-height: 1.25;
+  color: #ffffff;
+}
+
+.header .hindi-title {
+  font-size: 13px;
+  color: #f7931e;
+  font-weight: normal;
+  margin-left: 6px;
+}
+
+.header .sub {
+  font-size: 13px;
+  color: #d1e2f6;
+  margin-top: 3px;
+  font-weight: normal;
+}
+
+/* --- Navigation Bar --- */
+.nav-bar {
+  background: #082d52;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.nav-container {
+  max-width: 1060px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 4px;
+}
+
+.nav-links li a {
+  display: inline-flex;
+  align-items: center;
+  padding: 11px 16px;
+  color: #e2e8f0;
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  border-bottom: 3px solid transparent;
+}
+
+.nav-links li a:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border-bottom-color: var(--gov-saffron);
+}
+
+.nav-links li.nav-admin a {
+  color: #fed7aa;
+}
+
+.nav-links li.nav-admin a:hover {
+  color: #ffffff;
+}
+
+/* --- Band --- */
+.band {
+  background: var(--gov-saffron);
+  height: 4px;
+  width: 100%;
+}
+
+/* --- Main Layout Container --- */
+.container {
+  max-width: 960px;
+  width: 92%;
+  margin: 28px auto 44px;
+  background: var(--bg-card);
+  padding: 34px 38px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  flex: 1;
+}
+
+/* --- Page Typography Defaults --- */
+h2 {
+  color: var(--gov-blue);
+  font-size: 22px;
+  font-weight: bold;
+  margin-top: 0;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #edf2f7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+h3 {
+  color: var(--gov-blue-dark);
+  font-size: 17px;
+  font-weight: bold;
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+p {
+  color: var(--text-body);
+  font-size: 14.5px;
+  line-height: 1.6;
+  margin: 10px 0;
+}
+
+/* --- Buttons --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gov-blue);
+  color: #ffffff;
+  border: 1px solid transparent;
+  padding: 10px 22px;
+  font-size: 14.5px;
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all 0.18s ease-in-out;
+  box-shadow: 0 2px 4px rgba(11, 61, 110, 0.2);
+  min-height: 42px;
+  vertical-align: middle;
+}
+
+.btn:hover {
+  background: var(--gov-blue-light);
+  box-shadow: 0 4px 8px rgba(11, 61, 110, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(11, 61, 110, 0.2);
+}
+
+.btn-secondary {
+  background: #475569;
+}
+.btn-secondary:hover {
+  background: #334155;
+}
+
+.btn-success {
+  background: var(--gov-green);
+}
+.btn-success:hover {
+  background: #0f6d06;
+}
+
+.btn-danger {
+  background: var(--danger);
+}
+.btn-danger:hover {
+  background: #991b1b;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--gov-blue);
+  border: 1.5px solid var(--gov-blue);
+  box-shadow: none;
+}
+.btn-outline:hover {
+  background: rgba(11, 61, 110, 0.05);
+  color: var(--gov-blue-dark);
+}
+
+/* --- Form Styles --- */
+form {
+  margin: 16px 0;
+}
+
+label {
+  display: block;
+  margin: 14px 0 6px;
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--text-dark);
+}
+
+input[type=text],
+input[type=password],
+input[type=tel],
+input[type=file],
+select,
+textarea {
+  width: 100%;
+  max-width: 440px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border-light);
+  font-size: 14.5px;
+  font-family: Arial, Helvetica, sans-serif;
+  box-sizing: border-box;
+  border-radius: var(--radius-md);
+  background-color: #ffffff;
+  color: var(--text-dark);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  min-height: 44px;
+}
+
+input[type=text]:focus,
+input[type=password]:focus,
+input[type=tel]:focus,
+input[type=file]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--gov-blue);
+  box-shadow: 0 0 0 3px rgba(11, 61, 110, 0.14);
+  outline: none;
+}
+
+input::placeholder {
+  color: #94a3b8;
+  font-size: 13.5px;
+}
+
+select {
+  appearance: auto;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+input[type=checkbox] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--gov-blue);
+  vertical-align: middle;
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+/* --- Multi-step Wizard Indicator (.steps) --- */
+.steps {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  background: #f8fafc;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid var(--gov-saffron);
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.steps b {
+  color: var(--gov-blue);
+  background: #e2eaf4;
+  padding: 3px 9px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+}
+
+/* --- Alerts and Callouts --- */
+.flash {
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  border-left: 5px solid var(--danger);
+  color: var(--danger);
+  padding: 12px 18px;
+  margin: 16px 0;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.note {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 10px 0;
+}
+
+.info-banner {
+  background: var(--info-bg);
+  border: 1px solid var(--info-border);
+  border-left: 4px solid var(--gov-blue);
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  margin: 16px 0;
+  font-size: 14px;
+}
+
+/* --- Tables --- */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 16px 0 24px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+}
+
+table.tbl {
+  border-collapse: collapse;
+  width: 100%;
+  background: #ffffff;
+  font-size: 14px;
+  margin: 0;
+}
+
+table.tbl th {
+  background: #f8fafc;
+  color: var(--gov-blue);
+  font-weight: bold;
+  padding: 11px 14px;
+  border-bottom: 2px solid var(--border-light);
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  text-align: left;
+  white-space: nowrap;
+}
+
+table.tbl td {
+  border-bottom: 1px solid #edf2f7;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  padding: 11px 14px;
+  color: var(--text-body);
+  vertical-align: middle;
+}
+
+table.tbl tr:last-child td {
+  border-bottom: none;
+}
+
+table.tbl tr:hover td {
+  background-color: #f8fbff;
+}
+
+table.tbl th:first-child, table.tbl td:first-child {
+  padding-left: 16px;
+}
+
+table.tbl th:last-child, table.tbl td:last-child {
+  padding-right: 16px;
+}
+
+/* --- Status Badges --- */
+.badge-status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.3px;
+}
+
+.badge-pending {
+  background: var(--warning-bg);
+  color: var(--warning);
+  border: 1px solid var(--warning-border);
+}
+
+.badge-approved {
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid var(--success-border);
+}
+
+.badge-rejected {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border: 1px solid var(--danger-border);
+}
+
+.badge-deemed {
+  background: var(--info-bg);
+  color: var(--info);
+  border: 1px solid var(--info-border);
+}
+
+/* --- Quick Action Cards Grid --- */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.feature-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md);
+  padding: 18px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+  border-color: #cbd5e1;
+}
+
+/* --- Footer --- */
+.footer {
+  margin-top: auto;
+  background: #072646;
+  color: #94a3b8;
+  font-size: 13px;
+  border-top: 3px solid var(--gov-saffron);
+  padding: 32px 20px 24px;
+}
+
+.footer-container {
+  max-width: 1060px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  margin-bottom: 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.footer a {
+  color: #e2e8f0;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s;
+}
+
+.footer a:hover {
+  color: var(--gov-saffron);
+  text-decoration: underline;
+}
+
+.footer-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 18px auto;
+  max-width: 700px;
+}
+
+.footer-meta {
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+.footer-meta strong {
+  color: #cbd5e1;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN BREAKPOINTS
+   ========================================================================== */
+@media (max-width: 768px) {
+  .header {
+    padding: 14px 16px;
+  }
+
+  .header-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .container {
+    width: 95%;
+    margin: 16px auto 30px;
+    padding: 20px 16px;
+    border-radius: var(--radius-md);
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  h2 {
+    font-size: 19px;
+  }
+
+  input[type=text],
+  input[type=password],
+  input[type=tel],
+  input[type=file],
+  select {
+    max-width: 100%;
+  }
+
+  .btn {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  .top-utility-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 8px 14px;
+  }
+
+  .top-utility-bar .utility-links {
+    gap: 10px;
+    font-size: 11px;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 16px 12px;
+  }
+  
+  .header h1 {
+    font-size: 18px;
+  }
+  
+  .steps {
+    font-size: 12px;
+    padding: 10px 12px;
+  }
+}
 </style>
 </head>
 <body>
-<div class="header">
-  <h1>Sewa Setu &mdash; Old Age Pension Portal</h1>
-  <div class="sub">Department of Social Welfare &middot; Government of Purvanchal</div>
+<!-- Government Tricolor Top Ribbon -->
+<div class="top-tricolor"></div>
+
+<!-- Official Top Utility Bar -->
+<div class="top-utility-bar">
+  <div class="gov-identity">
+    <span class="flag-dot"></span>
+    Government of Purvanchal &middot; Department of Social Welfare
+  </div>
+  <div class="utility-links">
+    <span class="helpline-badge">Toll-Free Helpline: 1800-180-1555</span>
+    <a href="/about">Scheme Rules</a>
+    <a href="/status">Track Status</a>
+    <a href="/admin/login">Department Login</a>
+  </div>
 </div>
+
+<!-- Main Brand Header -->
+<div class="header">
+  <div class="header-container">
+    <a href="/" class="brand-section">
+      <div class="emblem-wrapper" title="Government of Purvanchal">
+        <!-- SVG Emblem Mark -->
+        <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="46" stroke="#f7931e" stroke-width="4" fill="#072646"/>
+          <circle cx="50" cy="50" r="38" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="3 3"/>
+          <circle cx="50" cy="50" r="14" stroke="#ffffff" stroke-width="2.5"/>
+          <path d="M50 16 L50 84 M16 50 L84 50 M26 26 L74 74 M26 74 L74 26" stroke="#f7931e" stroke-width="1.5"/>
+          <path d="M38 38 L62 62 M38 62 L62 38" stroke="#ffffff" stroke-width="1"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Sewa Setu <span class="hindi-title">&mdash; सेवा सेतु</span></h1>
+        <div class="sub">Old Age Pension Portal &middot; Department of Social Welfare, Purvanchal</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- Navigation Bar -->
+<nav class="nav-bar">
+  <div class="nav-container">
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/apply">Apply for Pension</a></li>
+      <li><a href="/status">Check Application Status</a></li>
+      <li><a href="/about">About Scheme &amp; Guidelines</a></li>
+      <li class="nav-admin"><a href="/admin/login">&bull; Officer Portal</a></li>
+    </ul>
+  </div>
+</nav>
+
 <div class="band"></div>
-<div class="container">
+
+<main class="container">
 {% with messages = get_flashed_messages() %}
   {% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}
 {% endwith %}
 {% block content %}{% endblock %}
-</div>
-<div class="footer">
-  <a href="/about">About the Scheme</a> |
-  <a href="/rti">RTI</a> |
-  <a href="/grievance">Grievance Cell</a> |
-  <a href="http://swd.purvanchal.nic.in/pension-rules-2019.pdf">Pension Rules 2019</a> |
-  <a href="/contact">Contact Us</a><br>
-  Site designed &amp; developed by Netlink Infosolutions Pvt Ltd. Best viewed in 1024x768.
-</div>
+</main>
+
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-links">
+      <a href="/about">About the Scheme</a>
+      <a href="/rti">RTI</a>
+      <a href="/grievance">Grievance Cell</a>
+      <a href="http://swd.purvanchal.nic.in/pension-rules-2019.pdf">Pension Rules 2019</a>
+      <a href="/contact">Contact Us</a>
+      <a href="/admin/login">Department Login</a>
+    </div>
+    <div class="footer-divider"></div>
+    <div class="footer-meta">
+      <strong>Sewa Setu Portal</strong> &mdash; An initiative under Digital Purvanchal.<br>
+      Department of Social Welfare, Government of Purvanchal.<br>
+      Site designed &amp; developed by Netlink Infosolutions Pvt Ltd. Optimized for desktop and mobile devices.
+    </div>
+  </div>
+</footer>
 </body>
 </html>
+

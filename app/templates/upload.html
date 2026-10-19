@@ -1,12 +1,40 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="steps"><b>Step 5 of 6:</b> Document Upload</div>
+<div class="steps">
+  <span style="color:#16a34a;">&#10003; Mobile</span> &rsaquo;
+  <span style="color:#16a34a;">&#10003; Personal</span> &rsaquo;
+  <span style="color:#16a34a;">&#10003; Address</span> &rsaquo;
+  <span style="color:#16a34a;">&#10003; Bank</span> &rsaquo;
+  <b>Step 5 of 6:</b>
+  <span style="color:#0b3d6e;font-weight:bold;">Document Upload</span> &rsaquo;
+  <span>Declaration</span>
+</div>
+
 <h2>Upload Age Proof Document</h2>
-<p class="note">Accepted documents: Birth certificate, School leaving certificate,
-Voter ID. Accepted formats: <b>JPG or PDF, maximum size 5 MB</b>.</p>
-<form method="post" enctype="multipart/form-data">
-  <label>Select Document</label>
-  <input type="file" name="document">
-  <p><button class="btn" type="submit">Upload &amp; Continue</button></p>
+
+<div style="background:#f8fafc;border:1px solid #e2e8f0;padding:16px 20px;border-radius:8px;margin-bottom:24px;">
+  <div style="font-weight:bold;color:#0b3d6e;margin-bottom:6px;font-size:14.5px;">Document Requirements</div>
+  <p class="note" style="margin:0;line-height:1.6;">
+    Accepted documents: <strong>Birth certificate</strong>, <strong>School leaving certificate</strong>, <strong>Voter ID</strong>.<br>
+    Accepted formats: <b>JPG or PDF, maximum size 5 MB</b>.
+  </p>
+</div>
+
+<form method="post" enctype="multipart/form-data" style="max-width:540px;">
+  <div style="background:#ffffff;border:2px dashed #cbd5e1;border-radius:8px;padding:28px 20px;text-align:center;margin-bottom:24px;transition:border-color 0.2s;">
+    <div style="font-size:36px;color:#0b3d6e;margin-bottom:8px;">&#128196;</div>
+    <label for="document" style="margin:0 0 8px;font-size:15px;color:#0b3d6e;cursor:pointer;">Select Document (Age Proof) <span style="color:#b91c1c;">*</span></label>
+    <div style="margin:12px auto;max-width:320px;">
+      <input type="file" id="document" name="document" accept=".jpg,.jpeg,.pdf" required style="max-width:100%;cursor:pointer;">
+    </div>
+    <div class="note" style="margin:8px 0 0;font-size:12.5px;color:#64748b;">
+      Ensure applicant's name and date of birth are clearly legible.
+    </div>
+  </div>
+
+  <p style="margin-top:20px;">
+    <button class="btn" type="submit">Upload &amp; Continue &rsaquo;</button>
+  </p>
 </form>
 {% endblock %}
+

@@ -1,24 +1,86 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Application Status</h2>
-<table class="tbl" style="max-width:640px">
-  <tr><th>Application No</th><td>{{ a[0] }}</td></tr>
-  <tr><th>Applicant Name</th><td>{{ a[1] }}</td></tr>
-  <tr><th>Mobile</th><td>{{ a[2] }}</td></tr>
-  <tr><th>Date of Birth</th><td>{{ a[3] }}</td></tr>
-  <tr><th>Village</th><td>{{ a[4] }}</td></tr>
-  <tr><th>Block</th><td>{{ a[5] }}</td></tr>
-  <tr><th>Bank Account</th><td>{{ a[6] }}</td></tr>
-  <tr><th>IFSC</th><td>{{ a[7] }}</td></tr>
-  <tr><th>Status</th><td><b>{{ a[8] }}</b></td></tr>
-  <tr><th>Submitted</th><td>{{ a[9] }}</td></tr>
-  <tr><th>Decided</th><td>{{ a[10] or '-' }}</td></tr>
-</table>
-<p>
-  <a href="/ack/{{ app_id }}.pdf"><button class="btn">Download Acknowledgment (PDF)</button></a>
-  {% if a[8] == 'PENDING' %}
-  &nbsp;
-  <a href="/application/{{ app_id }}/edit"><button class="btn" style="background:#0275d8;">Edit / Correct Details</button></a>
-  {% endif %}
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:12px;">
+  <h2 style="margin:0;border:none;padding:0;">Application Status</h2>
+  <div>
+    <span class="badge-status {% if a[8]=='APPROVED' or a[8]=='DEEMED_APPROVED' %}badge-approved{% elif a[8]=='REJECTED' %}badge-rejected{% else %}badge-pending{% endif %}" style="font-size:13px;padding:6px 14px;">
+      {{ a[8] }}
+    </span>
+  </div>
+</div>
+
+<p class="note" style="margin-bottom:20px;">
+  Review your recorded application details below. Under the Purvanchal Right to Public Services Act, applications are decided within 15 statutory days.
 </p>
+
+<div class="table-responsive" style="max-width:720px;">
+  <table class="tbl">
+    <tbody>
+      <tr>
+        <th style="width:200px;">Application No</th>
+        <td><strong style="color:#0b3d6e;font-size:15px;">{{ a[0] }}</strong></td>
+      </tr>
+      <tr>
+        <th>Applicant Name</th>
+        <td><strong style="font-size:14.5px;">{{ a[1] }}</strong></td>
+      </tr>
+      <tr>
+        <th>Mobile</th>
+        <td>{{ a[2] }}</td>
+      </tr>
+      <tr>
+        <th>Date of Birth</th>
+        <td>{{ a[3] }}</td>
+      </tr>
+      <tr>
+        <th>Village / Town</th>
+        <td>{{ a[4] }}</td>
+      </tr>
+      <tr>
+        <th>Block</th>
+        <td>{{ a[5] }}</td>
+      </tr>
+      <tr>
+        <th>Bank Account</th>
+        <td><span style="font-family:monospace;letter-spacing:1px;font-size:14.5px;">{{ a[6] }}</span></td>
+      </tr>
+      <tr>
+        <th>IFSC Code</th>
+        <td><span style="font-family:monospace;font-weight:bold;color:#0b3d6e;">{{ a[7] }}</span></td>
+      </tr>
+      <tr>
+        <th>Status</th>
+        <td>
+          <span class="badge-status {% if a[8]=='APPROVED' or a[8]=='DEEMED_APPROVED' %}badge-approved{% elif a[8]=='REJECTED' %}badge-rejected{% else %}badge-pending{% endif %}">
+            <b>{{ a[8] }}</b>
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <th>Submitted On</th>
+        <td>{{ a[9] }}</td>
+      </tr>
+      <tr>
+        <th>Decision Date</th>
+        <td>{{ a[10] or '-' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div style="display:flex;gap:12px;flex-wrap:wrap;margin:24px 0 16px;">
+  <a href="/ack/{{ app_id }}.pdf" style="text-decoration:none;">
+    <button class="btn btn-success" style="padding:10px 22px;">
+      &#128196; Download Acknowledgment (PDF)
+    </button>
+  </a>
+  {% if a[8] == 'PENDING' %}
+  <a href="/application/{{ app_id }}/edit" style="text-decoration:none;">
+    <button class="btn" style="background:#0275d8;padding:10px 22px;">
+      &#9998; Edit / Correct Details
+    </button>
+  </a>
+  {% endif %}
+</div>
 {% endblock %}
+
